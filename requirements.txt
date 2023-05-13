@@ -32,6 +32,7 @@ python-dotenv==1.0.0
 requests==2.30.0
 six==1.16.0
 SQLAlchemy==2.0.13
+SQLAlchemy-Utils==0.41.1
 stack-data==0.6.2
 traitlets==5.9.0
 typing_extensions==4.5.0
