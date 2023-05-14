@@ -12,6 +12,9 @@ class User(db.Model):
 
     __tablename__ = 'users'
 
+    # Relationships:
+    #   - One User to Many Experience(s)
+
     id = db.Column(
         db.Integer,
         primary_key=True,
