@@ -14,6 +14,7 @@ class User(db.Model):
 
     # Relationships:
     #   - One User to Many Experience(s)
+    #   - One User to Many Training(s)
 
     id = db.Column(
         db.Integer,
