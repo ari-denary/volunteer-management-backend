@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    StringField, DateField, BooleanField, PasswordField
+    StringField, DateField, BooleanField, PasswordField, EmailField
 )
 from wtforms.validators import InputRequired, Email, AnyOf, ValidationError
 from datetime import datetime
@@ -27,7 +27,7 @@ class SignUpForm(FlaskForm):
     class Meta:
         csrf = False
 
-    email = StringField(
+    email = EmailField(
         "Email",
         validators=[InputRequired(), Email()]
     )
