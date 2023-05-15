@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    StringField, DateField, BooleanField, PasswordField, EmailField
+    StringField, DateTimeField, BooleanField, PasswordField, EmailField
 )
 from wtforms.validators import InputRequired, Email, AnyOf, ValidationError
 from datetime import datetime
-from dateutil import tz, relativedelta
+from dateutil import relativedelta
 
 VALID_STATUS = ["new", "active", "inactive"]
 
@@ -55,7 +55,7 @@ class SignUpForm(FlaskForm):
         validators=[InputRequired()]
     )
 
-    dob = DateField(
+    dob = DateTimeField(
         "Date of Birth",
         validators=[InputRequired(), over_18()]
     )
