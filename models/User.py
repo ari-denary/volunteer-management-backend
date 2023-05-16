@@ -12,6 +12,38 @@ class User(db.Model):
 
     __tablename__ = 'users'
 
+    def __init__(
+        self,
+        email,
+        password,
+        first_name,
+        last_name,
+        dob,
+        gender,
+        address,
+        city,
+        state,
+        zip_code,
+        phone_number
+    ):
+
+        hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+
+        email=email,
+        password=hashed_pwd,
+        first_name=first_name,
+        last_name=last_name,
+        dob=dob,
+        gender=gender,
+        address=address,
+        city=city,
+        state=state,
+        zip_code=zip_code,
+        phone_number=phone_number
+
+    def __repr__(self):
+        return '<User %r %r %r>' % self.id, self.first_name, self.last_name
+
     # Relationships:
     #   - One User to Many Experience(s)
     #   - One User to Many Training(s)
@@ -102,45 +134,6 @@ class User(db.Model):
     )
 
     @classmethod
-    def signup(
-        cls,
-        email,
-        password,
-        first_name,
-        last_name,
-        dob,
-        gender,
-        address,
-        city,
-        state,
-        zip_code,
-        phone_number
-    ):
-        """Sign up user.
-
-        Hashes password and adds user to system.
-        """
-
-        hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
-
-        user = User(
-            email=email,
-            password=hashed_pwd,
-            first_name=first_name,
-            last_name=last_name,
-            dob=dob,
-            gender=gender,
-            address=address,
-            city=city,
-            state=state,
-            zip_code=zip_code,
-            phone_number=phone_number
-        )
-
-        db.session.add(user)
-        return user
-
-    @classmethod
     def authenticate(cls, email, password):
         """Find user with `email` and `password`.
 
@@ -160,3 +153,45 @@ class User(db.Model):
                 return user
 
         return False
+
+    # Commented out class method below until comparison between class method vs.
+    # init is determined
+
+    # @classmethod
+    # def signup(
+    #     cls,
+    #     email,
+    #     password,
+    #     first_name,
+    #     last_name,
+    #     dob,
+    #     gender,
+    #     address,
+    #     city,
+    #     state,
+    #     zip_code,
+    #     phone_number
+    # ):
+    #     """Sign up user.
+
+    #     Hashes password and adds user to system.
+    #     """
+
+    #     hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+
+    #     user = User(
+    #         email=email,
+    #         password=hashed_pwd,
+    #         first_name=first_name,
+    #         last_name=last_name,
+    #         dob=dob,
+    #         gender=gender,
+    #         address=address,
+    #         city=city,
+    #         state=state,
+    #         zip_code=zip_code,
+    #         phone_number=phone_number
+    #     )
+
+    #     db.session.add(user)
+    #     return user
