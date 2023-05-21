@@ -13,7 +13,7 @@ u1 = User.signup(
     badge_number=1,
     email='admin@mail.com',
     password='password',
-    first_name="test",
+    first_name="first",
     last_name="user",
     dob=datetime(year=2000, month=1, day=1),
     gender="Prefer not to say",
@@ -21,7 +21,9 @@ u1 = User.signup(
     city="New York",
     state="NY",
     zip_code="11001",
-    phone_number="9991234567"
+    phone_number="9991234567",
+    is_student=True,
+    is_multilingual=False
 )
 
 # add users to db
