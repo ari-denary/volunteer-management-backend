@@ -8,6 +8,7 @@ from datetime import datetime
 
 from models.models import db
 from models.User import User
+from models.Experience import Experience
 
 # To use a different database for tests, reset env variable.
 # Must be before app is imported
@@ -19,6 +20,7 @@ bcrypt = Bcrypt()
 
 # Create tables once for all tests.
 # Data deleted & fresh test data set within each test
+Experience.__table__.drop(db.engine)
 db.drop_all()
 db.create_all()
 
