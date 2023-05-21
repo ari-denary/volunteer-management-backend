@@ -41,9 +41,14 @@ def verify_jwt():
     """
     Check that a token is valid, if it is provided.
     Token is optional in this route - authentication only.
+    If invalid token received, returns JSON:
+    { "errors": "Invalid token" }
     """
 
-    verify_jwt_in_request(locations=['headers', 'cookies'], optional=True)
+    try:
+        verify_jwt_in_request(locations=['headers', 'cookies'], optional=True)
+    except Exception:
+        return jsonify(errors="Invalid token")
 
 @app.post("/signup")
 def signup():
