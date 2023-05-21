@@ -1,18 +1,16 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    StringField, DateTimeField, BooleanField, PasswordField, EmailField
+    StringField, DateTimeField, BooleanField, PasswordField, EmailField, IntegerField
 )
-from wtforms.validators import InputRequired, Email, AnyOf, ValidationError
+from wtforms.validators import InputRequired, Email, AnyOf, ValidationError, Optional
 from datetime import datetime
 from dateutil import relativedelta
-
-VALID_STATUS = ["new", "active", "inactive"]
 
 def over_18():
     message = 'You must be 18 years or older to volunteer'
 
     def _over_18(form, field):
-        naive_today = datetime.date.today()
+        naive_today = datetime.today()
         naive_dob = datetime(field.data)
         diff = relativedelta(naive_today, naive_dob)
 
@@ -27,6 +25,11 @@ class SignUpForm(FlaskForm):
     class Meta:
         csrf = False
 
+    badge_number = IntegerField(
+        "Badge Number",
+        validators=[InputRequired()]
+    )
+
     email = EmailField(
         "Email",
         validators=[InputRequired(), Email()]
@@ -35,14 +38,6 @@ class SignUpForm(FlaskForm):
     password = PasswordField(
         "Password",
         validators=[InputRequired()]
-    )
-
-    status = StringField(
-        "Status",
-        validators=[AnyOf(
-            values=VALID_STATUS,
-            message="Status must be either 'new', 'active', or 'inactive'"
-        )]
     )
 
     first_name = StringField(
@@ -57,7 +52,7 @@ class SignUpForm(FlaskForm):
 
     dob = DateTimeField(
         "Date of Birth",
-        validators=[InputRequired(), over_18()]
+        validators=[InputRequired()]
     )
 
     gender = StringField(
@@ -97,5 +92,5 @@ class SignUpForm(FlaskForm):
 
     is_multilingual = BooleanField(
         "Speaks another language?",
-        validators=[InputRequired()]
+        validators=[]
     )
