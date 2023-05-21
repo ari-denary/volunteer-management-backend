@@ -8,7 +8,6 @@ from datetime import datetime
 
 from models.models import db
 from models.User import User
-# from models.Experience import Experience
 
 # To use a different database for tests, reset env variable.
 # Must be before app is imported
@@ -26,7 +25,6 @@ db.create_all()
 
 class UserModelTestCase(TestCase):
     def setUp(self):
-        # Experience.query.delete()
         User.query.delete()
 
         hashed_password = (bcrypt
@@ -60,13 +58,6 @@ class UserModelTestCase(TestCase):
 
     def tearDown(self):
         db.session.rollback()
-
-    def test_user_model(self):
-        User.query.get(self.u1_id)
-        # u1 = User.query.get(self.u1_id)
-
-        # User should have no experiences #TODO:
-        # self.assertEqual(len(u1.messages), 0)
 
     # #################### Signup Tests
 
