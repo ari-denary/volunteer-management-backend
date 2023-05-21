@@ -1,10 +1,10 @@
 """Auth View tests."""
 
 import os
-from flask import json
 from unittest import TestCase
 from datetime import datetime
 from models.User import User
+from models.Experience import Experience
 from models.models import db
 
 # To use a different database for tests, resetting env variable.
@@ -17,6 +17,8 @@ app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 
 # Create tables once for all tests.
 # Data deleted & fresh test data set within each test
+Experience.__table__.drop(db.engine)
+db.drop_all()
 db.create_all()
 
 # Disable WTForms from using CSRF at all
@@ -28,14 +30,14 @@ class AuthViewTestCase(TestCase):
         User.query.delete()
 
         u1 = User.signup(
-            badge_number=100,
-            email='test@mail.com',
+            badge_number=1,
+            email='u1@mail.com',
             password='password',
-            first_name="test",
-            last_name="user",
+            first_name="u1",
+            last_name="test",
             dob=datetime(year=2000, month=1, day=1),
             gender="Prefer not to say",
-            address="123 Cherry lane",
+            address="1 Cherry lane",
             city="New York",
             state="NY",
             zip_code="11001",
@@ -60,13 +62,13 @@ class AuthViewTestCase(TestCase):
                 "/signup",
                 json={
                     "badge_number":"2",
-                    "email":"sample2@mail.com",
+                    "email":"u2@mail.com",
                     "password":"password",
-                    "first_name":"sample",
-                    "last_name":"user",
+                    "first_name":"u2",
+                    "last_name":"test",
                     "dob":"2000-01-01 00:00:00",
                     "gender":"Prefer not to say",
-                    "address":"123 Cherry lane",
+                    "address":"2 Cherry lane",
                     "city":"New York",
                     "state":"NY",
                     "zip_code":"11001",
@@ -82,14 +84,40 @@ class AuthViewTestCase(TestCase):
             resp = c.post(
                 "/signup",
                 json={
-                    "badge_number":"300",
-                    "email":"test@mail.com",
+                    "badge_number":"3",
+                    "email":"u1@mail.com",
                     "password":"password",
-                    "first_name":"test300",
-                    "last_name":"user",
+                    "first_name":"duplicate email",
+                    "last_name":"test",
                     "dob":"2000-01-01 00:00:00",
                     "gender":"Prefer not to say",
-                    "address":"123 Cherry lane",
+                    "address":"1 Cherry lane",
+                    "city":"New York",
+                    "state":"NY",
+                    "zip_code":"11001",
+                    "phone_number":"9991234567",
+                    "is_student": True,
+                    "is_multilingual": False
+                })
+
+            self.assertEqual(
+                resp.json["errors"],
+                "Invalid data: email or badge number already in use"
+            )
+
+    def test_signup_dupe_badge_num(self):
+        with self.client as c:
+            resp = c.post(
+                "/signup",
+                json={
+                    "badge_number":"1",
+                    "email":"u3@mail.com",
+                    "password":"password",
+                    "first_name":"duplicate badge",
+                    "last_name":"test",
+                    "dob":"2000-01-01 00:00:00",
+                    "gender":"Prefer not to say",
+                    "address":"1 Cherry lane",
                     "city":"New York",
                     "state":"NY",
                     "zip_code":"11001",
@@ -108,7 +136,7 @@ class AuthViewTestCase(TestCase):
             resp = c.post(
                 "/login",
                 json={
-                    "email": "test@mail.com",
+                    "email": "u1@mail.com",
                     "password": "password",
                 })
 
@@ -119,7 +147,7 @@ class AuthViewTestCase(TestCase):
             resp = c.post(
                 "/login",
                 json={
-                    "email": "test@mail.com",
+                    "email": "u1@mail.com",
                     "password": "badpassword",
                 })
 
