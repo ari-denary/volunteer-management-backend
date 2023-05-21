@@ -12,7 +12,6 @@ class User(db.Model):
 
     __tablename__ = 'users'
 
-
     def __repr__(self):
         return '<User %r %r %r>' % self.id, self.first_name, self.last_name
 
@@ -42,6 +41,12 @@ class User(db.Model):
     password = db.Column(
         db.Text,
         nullable=False,
+    )
+
+    status = db.Column(
+        db.String(50),
+        nullable=False,
+        default="new"
     )
 
     first_name = db.Column(
@@ -89,10 +94,15 @@ class User(db.Model):
         nullable=False
     )
 
-    status = db.Column(
-        db.String(50),
+    is_student = db.Column(
+        db.Boolean,
+        nullable=False
+    )
+
+    is_multilingual = db.Column(
+        db.Boolean,
         nullable=False,
-        default="Applied"
+        default=False
     )
 
     created_at = db.Column(
@@ -122,8 +132,6 @@ class User(db.Model):
 
         return False
 
-    # Commented out class method below until comparison between class method vs.
-    # init is determined
 
     @classmethod
     def signup(
@@ -139,7 +147,9 @@ class User(db.Model):
         city,
         state,
         zip_code,
-        phone_number
+        phone_number,
+        is_student,
+        is_multilingual
     ):
         """Sign up user.
 
@@ -160,7 +170,9 @@ class User(db.Model):
             city=city,
             state=state,
             zip_code=zip_code,
-            phone_number=phone_number
+            phone_number=phone_number,
+            is_student=is_student,
+            is_multilingual=is_multilingual
         )
 
         db.session.add(user)
