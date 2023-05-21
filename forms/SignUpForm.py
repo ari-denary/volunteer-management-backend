@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import (
     StringField, DateTimeField, BooleanField, PasswordField, EmailField, IntegerField
 )
-from wtforms.validators import InputRequired, Email, AnyOf, ValidationError, Optional
+from wtforms.validators import InputRequired, Email, ValidationError
 from datetime import datetime
 from dateutil import relativedelta
 
