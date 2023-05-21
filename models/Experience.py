@@ -1,7 +1,6 @@
 """SQLAlchemy models for an Experience"""
 
 from models.models import db
-from flask_sqlalchemy import SQLAlchemy
 from models.User import User
 
 class Experience(db.Model):

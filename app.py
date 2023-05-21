@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from models.models import db, connect_db
-from flask_cors import CORS, cross_origin, logging
+from flask_cors import CORS, cross_origin
 from flask_jwt_extended import (
     jwt_required,
     create_access_token,
@@ -131,6 +131,5 @@ def login():
             # Note: payload is stored on "sub" of token
             token = create_access_token(identity=user.id)
             return jsonify(token=token)
-
 
     return jsonify(errors="Invalid credentials")

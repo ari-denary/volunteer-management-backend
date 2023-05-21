@@ -1,9 +1,9 @@
-from app import app
+# from app import app
 from models.models import db
 from models.User import User
-from models.Experience import Experience
+# from models.Experience import Experience
 from datetime import datetime
-from dateutil import relativedelta
+# from dateutil import relativedelta
 
 
 db.drop_all()
