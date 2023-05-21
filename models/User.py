@@ -3,7 +3,6 @@
 from models.models import db
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy_utils import PhoneNumber
 
 bcrypt = Bcrypt()
 
@@ -100,6 +99,12 @@ class User(db.Model):
     )
 
     is_multilingual = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
+    is_admin = db.Column(
         db.Boolean,
         nullable=False,
         default=False
