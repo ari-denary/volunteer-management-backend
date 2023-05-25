@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from app import jwt_required, current_user
 from models.User import User
+from models.Experience import Experience
 
 users = Blueprint(
     "users",
@@ -13,7 +14,8 @@ users = Blueprint(
 @jwt_required(optional=False, locations=['headers', 'cookies'])
 def get_user(id):
     """
-    Gets a user by id. If same user or admin requesting with valid token,
+    Gets a user by id.
+    Authorization: must be same user or admin requesting with valid token.
     Returns JSON {
         user: {
             "address": "123 Cherry lane",
@@ -49,6 +51,34 @@ def get_user(id):
     return jsonify(errors="Unauthorized"), 401
 
 
-# get /id/experiences   Gets all experiences for a volunteer
-# same user or admin
+@users.get('/<int:id>/experiences')
+@jwt_required(optional=False, locations=['headers', 'cookies'])
+def get_user_experiences(id):
+    """
+    Gets all experiences for a user.
+    Authorization: must be same user or admin requesting with valid token.
+    Returns JSON {
+        user_experiences: [{
+            id: 1,
+            date: "2023-04-06-08:35:12:23",
+            sign_in_time: "2023-04-06-08:35:12:23",
+            sign_out_time: "2023-04-06-08:35:12:23",
+            department: "Lab",
+            user_id: 3
+        } ... ]
+    }
+    If unauthorized request, returns JSON { "errors": "Unauthorized" }
+    """
 
+    if (current_user.id == id or current_user.is_admin):
+        experiences = Experience.query.filter_by(user_id=id).all()
+
+        user_experiences = [e.serialize() for e in experiences]
+
+        return jsonify(user_experiences=user_experiences)
+
+    return jsonify(errors="Unauthorized"), 401
+
+
+# gets all users - admin only
+# update a user - same user or admin
