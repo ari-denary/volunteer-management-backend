@@ -10,9 +10,9 @@ from models.models import db
 from models.User import User
 from models.Experience import Experience
 
-# To use a different database for tests, reset env variable.
+# To use a different database for tests, set env variable.
 # Must be before app is imported
-os.environ['DATABASE_URL'] = "postgresql:///volunteer_management_test"
+os.environ['DATABASE_URI'] = "postgresql:///volunteer_management_test"
 
 from app import app
 
@@ -20,6 +20,7 @@ bcrypt = Bcrypt()
 
 # Create tables once for all tests.
 # Data deleted & fresh test data set within each test
+db.create_all()
 Experience.__table__.drop(db.engine)
 db.drop_all()
 db.create_all()
@@ -61,7 +62,8 @@ class UserModelTestCase(TestCase):
     def tearDown(self):
         db.session.rollback()
 
-    # #################### Signup Tests
+############################################################
+# Signup Tests
 
     def test_valid_signup(self):
         u2 = User.signup(
@@ -126,7 +128,8 @@ class UserModelTestCase(TestCase):
             )
             db.session.commit()
 
-    # #################### Authentication Tests
+################################################################
+# Authentication Tests
 
     def test_valid_authentication(self):
         u1 = User.query.get(self.u1_id)
