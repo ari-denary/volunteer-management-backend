@@ -10,8 +10,8 @@ class User(db.Model):
 
     __tablename__ = 'users'
 
-    def __repr__(self):
-        return '<User %r %r %r>' % self.id, self.first_name, self.last_name
+    # def __repr__(self):
+    #     return ('<User %r %r %r>' % self.id, self.first_name, self.last_name)
 
     # Relationships:
     #   - One User to Many Experience(s)
@@ -181,3 +181,26 @@ class User(db.Model):
 
         db.session.add(user)
         return user
+
+    def serialize(self):
+        """Serialize user data"""
+
+        return {
+            "id": self.id,
+            "badge_number": self.badge_number,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "dob": self.dob,
+            "gender": self.gender,
+            "address": self.address,
+            "city": self.city,
+            "state": self.state,
+            "zip_code": self.zip_code,
+            "phone_number": self.phone_number,
+            "is_student": self.is_student,
+            "is_multilingual": self.is_multilingual,
+            "is_admin": self.is_admin,
+            "status": self.status,
+            "created_at": self.created_at
+        }
