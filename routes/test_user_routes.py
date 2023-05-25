@@ -28,8 +28,15 @@ Experience.__table__.drop(db.engine)
 db.drop_all()
 db.create_all()
 
+BAD_TOKEN = (
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4NDk3" +
+    "OTk5OSwianRpIjoiNGI2NWQ3MTYtNTRkOS00NmFiLTg4YTQtZjdlNzY5YTk4OTVlIiwidHlw" +
+    "ZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNjg0OTc5OTk5LCJleHAiOjE2ODQ5ODA4OTl9" +
+    "TEfMrC8bzoxsfBU4M1Vabw"
+)
 
-class AuthViewTestCase(TestCase):
+
+class UsersViewsTestCase(TestCase):
     def setUp(self):
         Experience.query.delete()
         User.query.delete()
@@ -145,36 +152,50 @@ class AuthViewTestCase(TestCase):
     def tearDown(self):
         db.session.rollback()
 
+########################################################################
+# /users/<id> tests
+
     def test_get_user_success_same_user(self):
+        """User can successfully get their own details"""
+
         with self.client as c:
-            resp = c.get(f"/users/{self.u1_id}", headers={
-                "AUTHORIZATION": f"Bearer {self.u1_token}"
-            })
+            resp = c.get(
+                f"/users/{self.u1_id}",
+                headers={"AUTHORIZATION": f"Bearer {self.u1_token}"}
+            )
 
             user = resp.json['user']
             self.assertEqual(user['email'], "u1@mail.com")
             self.assertEqual(user['id'], self.u1_id)
 
     def test_get_user_success_admin(self):
+        """Admin can successfully get a user's details"""
+
         with self.client as c:
-            resp = c.get(f"/users/{self.u1_id}", headers={
-                "AUTHORIZATION": f"Bearer {self.admin_token}"
-            })
+            resp = c.get(
+                f"/users/{self.u1_id}",
+                headers={"AUTHORIZATION": f"Bearer {self.admin_token}"}
+            )
 
             user = resp.json['user']
             self.assertEqual(user['email'], "u1@mail.com")
             self.assertEqual(user['id'], self.u1_id)
 
     def test_get_user_fail_diff_user(self):
+        """User can NOT get another user's details"""
+
         with self.client as c:
-            resp = c.get(f"/users/{self.u1_id}", headers={
-                "AUTHORIZATION": f"Bearer {self.u2_token}"
-            })
+            resp = c.get(
+                f"/users/{self.u1_id}",
+                headers={"AUTHORIZATION": f"Bearer {self.u2_token}"}
+            )
 
             self.assertEqual(resp.status_code, 401)
             self.assertEqual(resp.json['errors'], "Unauthorized")
 
     def test_get_user_fail_no_token(self):
+        """Can NOT get a user without a token"""
+
         with self.client as c:
             resp = c.get(f"/users/{self.u1_id}")
 
@@ -182,15 +203,84 @@ class AuthViewTestCase(TestCase):
             self.assertIn("Missing JWT", resp.json['msg'])
 
     def test_get_user_fail_invalid_token(self):
-        with self.client as c:
-            bad_token = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJmcmVzaCI6ZmFsc" +
-            "2UsImlhdCI6MTY4NDk3OTk5OSwianRpIjoiNGI2NWQ3MTYtNTRkOS00NmFiLTg4YT" +
-            "QtZjdlNzY5YTk4OTVlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNjg" +
-            "0OTc5OTk5LCJleHAiOjE2ODQ5ODA4OTl9TEfMrC8bzoxsfBU4M1Vabw")
+        """Can NOT get a user with invalid token"""
 
-            resp = c.get(f"/users/{self.u1_id}", headers={
-                "AUTHORIZATION": f"Bearer {bad_token}"
-            })
+        with self.client as c:
+            resp = c.get(
+                f"/users/{self.u1_id}",
+                headers={"AUTHORIZATION": f"Bearer {BAD_TOKEN}"}
+            )
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.json['errors'], "Invalid token")
+
+########################################################################
+# /users/<id>/experiences tests
+
+    def test_get_user_experiences_success_same_user(self):
+        """User can successfully get a list of their own experiences"""
+
+        with self.client as c:
+            resp1 = c.get(
+                f"/users/{self.u1_id}/experiences",
+                headers={"AUTHORIZATION": f"Bearer {self.u1_token}"}
+            )
+
+            resp2 = c.get(
+                f"/users/{self.u2_id}/experiences",
+                headers={"AUTHORIZATION": f"Bearer {self.u2_token}"}
+            )
+
+            self.assertEqual(len(resp1.json['user_experiences']), 2)
+            self.assertEqual(len(resp2.json['user_experiences']), 0)
+
+
+    def test_get_user_experiences_success_admin(self):
+        """Admin can successfully get list of a user's experiences"""
+
+        with self.client as c:
+            resp1 = c.get(
+                f"/users/{self.u1_id}/experiences",
+                headers={"AUTHORIZATION": f"Bearer {self.admin_token}"}
+            )
+
+            resp2 = c.get(
+                f"/users/{self.u2_id}/experiences",
+                headers={"AUTHORIZATION": f"Bearer {self.admin_token}"}
+            )
+
+            self.assertEqual(len(resp1.json['user_experiences']), 2)
+            self.assertEqual(len(resp2.json['user_experiences']), 0)
+
+    def test_get_user_experiences_fail_diff_user(self):
+        """User can NOT get a list of another users' experiences"""
+
+        with self.client as c:
+            resp = c.get(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {self.u1_token}"}
+                )
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.json['errors'], "Unauthorized")
+
+    def test_get_user_experiences_fail_no_token(self):
+        """Can NOT get a list of a users' experiences without token"""
+
+        with self.client as c:
+            resp = c.get(f"/users/{self.u2_id}/experiences")
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertIn("Missing JWT", resp.json['msg'])
+
+    def test_get_user_experiences_fail_invalid_token(self):
+        """Can NOT get a list of a users' experiences with invalid token"""
+
+        with self.client as c:
+            resp = c.get(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {BAD_TOKEN}"}
+                )
 
             self.assertEqual(resp.status_code, 401)
             self.assertEqual(resp.json['errors'], "Invalid token")
