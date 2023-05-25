@@ -39,3 +39,17 @@ class Experience(db.Model):
         db.ForeignKey(User.id),
         nullable=False,
     )
+
+    def serialize(self):
+        """Serialize experience data"""
+
+        return {
+            "id": self.id,
+            "date": self.date,
+            "sign_in_time": self.sign_in_time,
+            "sign_out_time": self.sign_out_time,
+            "department": self.department,
+            "user_id": self.user_id
+        }
+
+
