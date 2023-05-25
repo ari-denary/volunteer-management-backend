@@ -112,6 +112,8 @@ class UsersViewsTestCase(TestCase):
         )
 
         admin.is_admin = True
+        admin.status = "active"
+        u1.status = "active"
         db.session.add_all([e1, e2])
         db.session.commit()
 
@@ -151,6 +153,133 @@ class UsersViewsTestCase(TestCase):
 
     def tearDown(self):
         db.session.rollback()
+
+########################################################################
+# /users tests
+
+    def test_get_users_success_admin(self):
+        """Admin can successfully get list of all users"""
+
+        with self.client as c:
+            self.maxDiff = None
+            resp = c.get(
+                f"/users",
+                headers={"AUTHORIZATION": f"Bearer {self.admin_token}"}
+            )
+
+            users = [u for u in resp.json['users']]
+            for u in users:
+                del u['id']
+
+            self.assertEqual(len(users), 3)
+            self.assertIn(
+                {
+                    "badge_number": 1,
+                    "email": "u1@mail.com",
+                    "first_name": "u1",
+                    "is_admin": False,
+                    "is_multilingual": False,
+                    "is_student": True,
+                    "last_name": "test",
+                    "status": "active"
+                },
+                users
+            )
+            self.assertIn(
+                {
+                    "badge_number": 2,
+                    "email": "u2@mail.com",
+                    "first_name": "u2",
+                    "is_admin": False,
+                    "is_multilingual": False,
+                    "is_student": False,
+                    "last_name": "test",
+                    "status": "new"
+                },
+                users
+            )
+            self.assertIn(
+                {
+                    "badge_number": 3,
+                    "email": 'admin@mail.com',
+                    "first_name": "Admin",
+                    "is_admin": True,
+                    "is_multilingual": False,
+                    "is_student": False,
+                    "last_name": "test",
+                    "status": "active"
+                },
+                users
+            )
+            self.assertListEqual(
+                users,
+                [
+                    {
+                        "badge_number": 1,
+                        "email": "u1@mail.com",
+                        "first_name": "u1",
+                        "is_admin": False,
+                        "is_multilingual": False,
+                        "is_student": True,
+                        "last_name": "test",
+                        "status": "active"
+                    },
+                    {
+                        "badge_number": 3,
+                        "email": 'admin@mail.com',
+                        "first_name": "Admin",
+                        "is_admin": True,
+                        "is_multilingual": False,
+                        "is_student": False,
+                        "last_name": "test",
+                        "status": "active"
+                    },
+                    {
+                        "badge_number": 2,
+                        "email": "u2@mail.com",
+                        "first_name": "u2",
+                        "is_admin": False,
+                        "is_multilingual": False,
+                        "is_student": False,
+                        "last_name": "test",
+                        "status": "new"
+                    }
+                ]
+            )
+
+    def test_get_users_fail_non_admin(self):
+        """Non-admin user can NOT get list of all users"""
+
+        with self.client as c:
+            resp = c.get(
+                f"/users",
+                headers={"AUTHORIZATION": f"Bearer {self.u1_token}"}
+            )
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.json['errors'], "Unauthorized")
+
+    def test_get_users_fail_no_token(self):
+        """Can NOT get list of all users without token"""
+
+        with self.client as c:
+            resp = c.get(f"/users")
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertIn("Missing JWT", resp.json['msg'])
+
+    def test_get_users_fail_invalid_token(self):
+        """Can NOT get list of all users with invalid token"""
+
+        with self.client as c:
+            resp = c.get(
+                f"/users",
+                headers={"AUTHORIZATION": f"Bearer {BAD_TOKEN}"}
+            )
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.json['errors'], "Invalid token")
+
 
 ########################################################################
 # /users/<id> tests

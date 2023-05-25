@@ -10,6 +10,47 @@ users = Blueprint(
     template_folder="../templates"
 )
 
+@users.get('')
+@jwt_required(optional=False, locations=['headers', 'cookies'])
+def get_users():
+    """
+    Gets all users.
+    Authorization: must be admin requesting with valid token.
+    Returns JSON {
+        users: [{
+            "id": 1,
+            "email": "admin@mail.com",
+            "badge_number": 100,
+            "first_name": "first",
+            "last_name": "user",
+            "is_admin": False,
+            "is_student": True,
+            "is_multilingual": False,
+            "status": "new"
+        } ... ]
+    }
+    If unauthorized request, returns JSON { "errors": "Unauthorized" }
+    """
+
+    if (current_user.is_admin):
+        user_instances = User.query.all()
+        users = []
+        for u in user_instances:
+            users.append({
+                "id": u.id,
+                "email": u.email,
+                "badge_number": u.badge_number,
+                "first_name": u.first_name,
+                "last_name": u.last_name,
+                "is_admin": u.is_admin,
+                "is_student": u.is_student,
+                "is_multilingual": u.is_multilingual,
+                "status": u.status
+            })
+        return jsonify(users=users)
+
+    return jsonify(errors="Unauthorized"), 401
+
 @users.get('/<int:id>')
 @jwt_required(optional=False, locations=['headers', 'cookies'])
 def get_user(id):
@@ -18,23 +59,23 @@ def get_user(id):
     Authorization: must be same user or admin requesting with valid token.
     Returns JSON {
         user: {
-            "address": "123 Cherry lane",
-            "badge_number": 100,
-            "city": "New York",
-            "created_at": "Sun, 21 May 2023 20:12:14 GMT",
-            "dob": "Sat, 01 Jan 2000 00:00:00 GMT",
-            "email": "admin@mail.com",
-            "first_name": "first",
-            "gender": "Prefer not to say",
             "id": 1,
+            "email": "admin@mail.com",
+            "badge_number": 100,
+            "first_name": "first",
+            "last_name": "user",
+            "dob": "Sat, 01 Jan 2000 00:00:00 GMT",
+            "gender": "Prefer not to say",
+            "created_at": "Sun, 21 May 2023 20:12:14 GMT",
+            "phone_number": "9991234567",
+            "address": "123 Cherry lane",
+            "city": "New York",
+            "state": "NY",
+            "zip_code": "11001"
             "is_admin": false,
             "is_multilingual": false,
             "is_student": true,
-            "last_name": "user",
-            "phone_number": "9991234567",
-            "state": "NY",
             "status": "new",
-            "zip_code": "11001"
         }
     }
     If unauthorized request, returns JSON { "errors": "Unauthorized" }
@@ -78,7 +119,3 @@ def get_user_experiences(id):
         return jsonify(user_experiences=user_experiences)
 
     return jsonify(errors="Unauthorized"), 401
-
-
-# gets all users - admin only
-# update a user - same user or admin
