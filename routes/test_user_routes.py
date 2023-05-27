@@ -125,7 +125,7 @@ class UsersViewsTestCase(TestCase):
 
         with self.client as c:
             resp1 = c.post(
-                "/login",
+                "/auth/login",
                 json={
                     "email": "u1@mail.com",
                     "password": "password",
@@ -134,7 +134,7 @@ class UsersViewsTestCase(TestCase):
             self.u1_token = resp1.json["token"]
 
             resp2 = c.post(
-                "/login",
+                "/auth/login",
                 json={
                     "email": "u2@mail.com",
                     "password": "password",
@@ -143,7 +143,7 @@ class UsersViewsTestCase(TestCase):
             self.u2_token = resp2.json["token"]
 
             resp_admin = c.post(
-                "/login",
+                "/auth/login",
                 json={
                     "email": "admin@mail.com",
                     "password": "password",
