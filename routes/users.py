@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from app import jwt_required, current_user
+from flask_jwt_extended import jwt_required, current_user
 from models.User import User
 from models.Experience import Experience
 
@@ -80,10 +80,6 @@ def get_user(id):
     }
     If unauthorized request, returns JSON { "errors": "Unauthorized" }
     """
-
-    print("GET_USER invoked with id = ", id)
-    print("CURRENT USER IS ", current_user)
-    print("CURRENT USER MATCHES REQUESTED ID ", current_user.id == id)
 
     if (current_user.id == id or current_user.is_admin):
         user = User.query.get_or_404(id)
