@@ -3,17 +3,18 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from models.models import db, connect_db
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from flask_jwt_extended import (
-    jwt_required,
     create_access_token,
-    get_jwt_identity,
     verify_jwt_in_request,
+    current_user,
+    jwt_required,
     JWTManager
 )
 from models.User import User
 from forms.LoginForm import LoginForm
 from forms.SignUpForm import SignUpForm
+from routes.users import users
 
 load_dotenv()
 
@@ -36,6 +37,15 @@ debug = DebugToolbarExtension(app)  # debug
 
 # from sqlalchemy.exc import IntegrityError
 
+@jwt.user_identity_loader
+def user_identity_lookup(user):
+    return user.id
+
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    return User.query.filter_by(id=identity).one_or_none()
+
 @app.before_request
 def verify_jwt():
     """
@@ -46,9 +56,13 @@ def verify_jwt():
     """
 
     try:
-        verify_jwt_in_request(locations=['headers', 'cookies'], optional=True)
+        jwt = verify_jwt_in_request(locations=['headers', 'cookies'], optional=True)
+        print("JWT VERIFIED as ", jwt)
     except Exception:
-        return jsonify(errors="Invalid token")
+        return jsonify(errors="Invalid token"), 401
+
+
+app.register_blueprint(users, url_prefix="/users")
 
 @app.post("/signup")
 def signup():
@@ -99,7 +113,7 @@ def signup():
             db.session.commit()
 
             # Note: payload is stored on "sub" of token
-            token = create_access_token(identity=user.id)
+            token = create_access_token(identity=user)
             return jsonify(token=token)
 
         except Exception:
@@ -134,7 +148,7 @@ def login():
 
         if user:
             # Note: payload is stored on "sub" of token
-            token = create_access_token(identity=user.id)
+            token = create_access_token(identity=user)
             return jsonify(token=token)
 
     return jsonify(errors="Invalid credentials")
