@@ -1,19 +1,21 @@
 # from app import app
-from models.models import db
+from app import db
 from models.User import User
+from models.Experience import Experience
 # from models.Experience import Experience
 from datetime import datetime
 # from dateutil import relativedelta
 
-
+db.create_all()
+Experience.__table__.drop(db.engine)
 db.drop_all()
 db.create_all()
 
 u1 = User.signup(
-    badge_number=1,
-    email='admin@mail.com',
+    badge_number=100,
+    email='u1@mail.com',
     password='password',
-    first_name="first",
+    first_name="u1",
     last_name="user",
     dob=datetime(year=2000, month=1, day=1),
     gender="Prefer not to say",
@@ -26,7 +28,61 @@ u1 = User.signup(
     is_multilingual=False
 )
 
-# add users to db
-db.session.add_all([u1])
+u2 = User.signup(
+    badge_number=200,
+    email='u2@mail.com',
+    password='password',
+    first_name="u2",
+    last_name="test",
+    dob=datetime(year=2000, month=1, day=1),
+    gender="Prefer not to say",
+    address="1 Cherry lane",
+    city="New York",
+    state="NY",
+    zip_code="11001",
+    phone_number="9991234567",
+    is_student=False,
+    is_multilingual=False
+)
+
+admin = User.signup(
+    badge_number=300,
+    email='admin@mail.com',
+    password='password',
+    first_name="Admin",
+    last_name="test",
+    dob=datetime(year=2000, month=1, day=1),
+    gender="Prefer not to say",
+    address="123 Cherry lane",
+    city="New York",
+    state="NY",
+    zip_code="11001",
+    phone_number="9991234567",
+    is_student=False,
+    is_multilingual=False
+)
+
+db.session.commit()
+
+e1 = Experience(
+    date=datetime(year=2022, month=1, day=5),
+    sign_in_time=datetime(year=2022, month=1, day=5, hour=8),
+    sign_out_time=datetime(year=2022, month=1, day=5, hour=10),
+    department="Lab",
+    user_id=1
+)
+
+e2 = Experience(
+    date=datetime(year=2022, month=1, day=8),
+    sign_in_time=datetime(year=2022, month=1, day=5, hour=12),
+    sign_out_time=datetime(year=2022, month=1, day=5, hour=16),
+    department="Pharmacy",
+    user_id=1
+)
+
+# add experiences to db
+db.session.add_all([e1, e2])
+
+admin.is_admin = True
 
 db.session.commit()
