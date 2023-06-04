@@ -155,7 +155,7 @@ class UsersViewsTestCase(TestCase):
         db.session.rollback()
 
 ########################################################################
-# /users tests
+# GET /users tests
 
     def test_get_users_success_admin(self):
         """Admin can successfully get list of all users"""
@@ -181,7 +181,8 @@ class UsersViewsTestCase(TestCase):
                     "is_multilingual": False,
                     "is_student": True,
                     "last_name": "test",
-                    "status": "active"
+                    "status": "active",
+                    "experience_hours": 10
                 },
                 users
             )
@@ -194,7 +195,8 @@ class UsersViewsTestCase(TestCase):
                     "is_multilingual": False,
                     "is_student": False,
                     "last_name": "test",
-                    "status": "new"
+                    "status": "new",
+                    "experience_hours": 0
                 },
                 users
             )
@@ -207,7 +209,8 @@ class UsersViewsTestCase(TestCase):
                     "is_multilingual": False,
                     "is_student": False,
                     "last_name": "test",
-                    "status": "active"
+                    "status": "active",
+                    "experience_hours": 0
                 },
                 users
             )
@@ -217,6 +220,7 @@ class UsersViewsTestCase(TestCase):
                     {
                         "badge_number": 1,
                         "email": "u1@mail.com",
+                        "experience_hours": 10,
                         "first_name": "u1",
                         "is_admin": False,
                         "is_multilingual": False,
@@ -227,6 +231,7 @@ class UsersViewsTestCase(TestCase):
                     {
                         "badge_number": 3,
                         "email": 'admin@mail.com',
+                        "experience_hours": 0,
                         "first_name": "Admin",
                         "is_admin": True,
                         "is_multilingual": False,
@@ -237,6 +242,7 @@ class UsersViewsTestCase(TestCase):
                     {
                         "badge_number": 2,
                         "email": "u2@mail.com",
+                        "experience_hours": 10,
                         "first_name": "u2",
                         "is_admin": False,
                         "is_multilingual": False,
@@ -282,7 +288,7 @@ class UsersViewsTestCase(TestCase):
 
 
 ########################################################################
-# /users/<id> tests
+# GET /users/<id> tests
 
     def test_get_user_success_same_user(self):
         """User can successfully get their own details"""
@@ -344,9 +350,9 @@ class UsersViewsTestCase(TestCase):
             self.assertEqual(resp.json['errors'], "Invalid token")
 
 ########################################################################
-# /users/<id>/experiences tests
+# GET /users/<id>/experiences tests
 
-    def test_get_user_experiences_success_same_user(self):
+    def test_get_user_experiences_success_all_same_user(self):
         """User can successfully get a list of their own experiences"""
 
         with self.client as c:
@@ -363,8 +369,9 @@ class UsersViewsTestCase(TestCase):
             self.assertEqual(len(resp1.json['user_experiences']), 2)
             self.assertEqual(len(resp2.json['user_experiences']), 0)
 
+    # get_user_experiences_success_open_same_user
 
-    def test_get_user_experiences_success_admin(self):
+    def test_get_user_experiences_success_all_admin(self):
         """Admin can successfully get list of a user's experiences"""
 
         with self.client as c:
@@ -381,7 +388,9 @@ class UsersViewsTestCase(TestCase):
             self.assertEqual(len(resp1.json['user_experiences']), 2)
             self.assertEqual(len(resp2.json['user_experiences']), 0)
 
-    def test_get_user_experiences_fail_diff_user(self):
+    # get_user_experiences_success_open_admin
+
+    def test_get_user_experiences_fail_all_diff_user(self):
         """User can NOT get a list of another users' experiences"""
 
         with self.client as c:
@@ -393,6 +402,8 @@ class UsersViewsTestCase(TestCase):
             self.assertEqual(resp.status_code, 401)
             self.assertEqual(resp.json['errors'], "Unauthorized")
 
+    # get_user_experiences_fail_open_diff_user
+
     def test_get_user_experiences_fail_no_token(self):
         """Can NOT get a list of a users' experiences without token"""
 
@@ -401,6 +412,8 @@ class UsersViewsTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 401)
             self.assertIn("Missing JWT", resp.json['msg'])
+
+    # get_user_experiences_fail_open_no_token
 
     def test_get_user_experiences_fail_invalid_token(self):
         """Can NOT get a list of a users' experiences with invalid token"""
@@ -413,3 +426,42 @@ class UsersViewsTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 401)
             self.assertEqual(resp.json['errors'], "Invalid token")
+
+    # get_user_experiences_fail_open_invalid_token
+
+########################################################################
+# POST /users/<id>/experiences tests
+
+# success create new experience same user
+
+# success create new experience admin
+
+# fail create new experience not all required inputs sent
+
+# fail create new experience diff user
+
+# fail create new experience no token
+
+# fail create new experience invalid token
+
+
+########################################################################
+# PATCH /users/<id>/experiences tests
+
+# success update experience same user
+
+# success update experience admin
+
+# update experience does not update other data (besides sign out/dept) same user
+
+# update experience does not update other data (besides sign out/dept) admin
+
+# fail update experience missing sign out time same user
+
+# fail update experience missing sign out time admin
+
+# fail update experience diff user
+
+# fail update experience no token
+
+# fail update experience invalid token

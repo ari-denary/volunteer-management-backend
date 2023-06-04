@@ -26,11 +26,13 @@ def get_users():
             "is_admin": False,
             "is_student": True,
             "is_multilingual": False,
-            "status": "new"
+            "status": "new",
+            "experience_hours": 10
         } ... ]
     }
     If unauthorized request, returns JSON { "errors": "Unauthorized" }
     """
+    # TODO: ADD total experience hours into JSON data returned from get_users
 
     if (current_user.is_admin):
         user_instances = User.query.all()
@@ -51,9 +53,9 @@ def get_users():
 
     return jsonify(errors="Unauthorized"), 401
 
-@users.get('/<int:id>')
+@users.get('/<int:user_id>')
 @jwt_required(optional=False, locations=['headers', 'cookies'])
-def get_user(id):
+def get_user(user_id):
     """
     Gets a user by id.
     Authorization: must be same user or admin requesting with valid token.
@@ -81,16 +83,16 @@ def get_user(id):
     If unauthorized request, returns JSON { "errors": "Unauthorized" }
     """
 
-    if (current_user.id == id or current_user.is_admin):
-        user = User.query.get_or_404(id)
+    if (current_user.id == user_id or current_user.is_admin):
+        user = User.query.get_or_404(user_id)
         return jsonify(user=user.serialize())
 
     return jsonify(errors="Unauthorized"), 401
 
 
-@users.get('/<int:id>/experiences')
+@users.get('/<int:user_id>/experiences')
 @jwt_required(optional=False, locations=['headers', 'cookies'])
-def get_user_experiences(id):
+def get_user_experiences(user_id):
     """
     Gets all experiences for a user.
     Authorization: must be same user or admin requesting with valid token.
@@ -107,11 +109,55 @@ def get_user_experiences(id):
     If unauthorized request, returns JSON { "errors": "Unauthorized" }
     """
 
-    if (current_user.id == id or current_user.is_admin):
-        experiences = Experience.query.filter_by(user_id=id).all()
+    # TODO: Add query params for open/recent experiences (request.args)
+    # If open/recent query param present, only get most recent experience(s)
+    # 	- checks for any open experiences for a volunteer where sign out = null
+    # 	- returns list of open experiences
+
+    if (current_user.id == user_id or current_user.is_admin):
+        experiences = Experience.query.filter_by(user_id=user_id).all()
 
         user_experiences = [e.serialize() for e in experiences]
 
         return jsonify(user_experiences=user_experiences)
 
     return jsonify(errors="Unauthorized"), 401
+
+# @users.post('/<int:user_id>/experiences')
+# @jwt_required
+# def create_user_experience(user_id):
+#     """
+#     Create a new experience. Use case for "signing-in" to an experience.
+#     Authorization: must be same user or admin requesting with valid token.
+#     Returns JSON {
+#         user_experience: {
+#             id: 1,
+#             date: "2023-04-06-08:35:12:23",
+#             sign_in_time: "2023-04-06-08:35:12:23",
+#             sign_out_time: "2023-04-06-08:35:12:23",
+#             department: "lab",
+#             user_id: 3
+#         }
+#     }
+#     If unauthorized request, returns JSON { "errors": "Unauthorized" }
+#     """
+
+# @users.patch('/<int:user_id>/experiences')
+# @jwt_required
+# def update_user_experience(user_id):
+#     """
+#     Update a user's experience sign out time and/or department.
+#     Use case for "signing-out" of an experience.
+#     Authorization: must be same user or admin requesting with valid token.
+#     Returns JSON {
+#         user_experience: {
+#             id: 1,
+#             date: "2023-04-06-08:35:12:23",
+#             sign_in_time: "2023-04-06-08:35:12:23",
+#             sign_out_time: "2023-04-06-08:35:12:23",
+#             department: "lab",
+#             user_id: 3
+#         }
+#     }
+#     If unauthorized request, returns JSON { "errors": "Unauthorized" }
+#     """
