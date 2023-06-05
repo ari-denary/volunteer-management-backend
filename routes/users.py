@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, current_user
 from models.User import User
 from models.Experience import Experience
@@ -32,7 +32,6 @@ def get_users():
     }
     If unauthorized request, returns JSON { "errors": "Unauthorized" }
     """
-    # TODO: ADD total experience hours into JSON data returned from get_users
 
     if (current_user.is_admin):
         user_instances = User.query.all()
@@ -100,28 +99,32 @@ def get_user(user_id):
 @jwt_required(optional=False, locations=['headers', 'cookies'])
 def get_user_experiences(user_id):
     """
-    Gets all experiences for a user.
+    Gets all experiences for a user. Optional query parameter of 'incomplete'
+    will return all experiences whose sign_out_time is None.
+    Primary use case for 'incomplete' is for getting experience(s) to "sign out".
     Authorization: must be same user or admin requesting with valid token.
     Returns JSON {
         user_experiences: [{
-            id: 1,
-            date: "2023-04-06-08:35:12:23",
-            sign_in_time: "2023-04-06-08:35:12:23",
-            sign_out_time: "2023-04-06-08:35:12:23",
-            department: "Lab",
-            user_id: 3
+            "id": 1,
+            "date": "2023-04-06-08:35:12:23",
+            "sign_in_time": "2023-04-06-08:35:12:23",
+            "sign_out_time": "2023-04-06-08:35:12:23",
+            "department": "lab",
+            "user_id": 3
         } ... ]
     }
     If unauthorized request, returns JSON { "errors": "Unauthorized" }
     """
 
-    # TODO: Add query params for open/recent experiences (request.args)
-    # If open/recent query param present, only get most recent experience(s)
-    # 	- checks for any open experiences for a volunteer where sign out = null
-    # 	- returns list of open experiences
-
     if (current_user.id == user_id or current_user.is_admin):
-        experiences = Experience.query.filter_by(user_id=user_id).all()
+        if 'incomplete' in request.args:
+            experiences = Experience.query.filter_by(
+                user_id=user_id
+            ).filter_by(
+                sign_out_time=None
+            ).all()
+        else:
+            experiences = Experience.query.filter_by(user_id=user_id).all()
 
         user_experiences = [e.serialize() for e in experiences]
 
