@@ -1,11 +1,13 @@
-# from app import app
+from app import app
 from models.models import db
 from models.User import User
 from models.Experience import Experience
 # from models.Experience import Experience
 from datetime import datetime
 # from dateutil import relativedelta
-from app import app
+from flask_debugtoolbar import DebugToolbarExtension
+debug = DebugToolbarExtension(app)  # debug
+
 
 db.create_all()
 Experience.__table__.drop(db.engine)
