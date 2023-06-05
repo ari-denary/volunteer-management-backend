@@ -67,3 +67,4 @@ class ExperienceModelTestCase(TestCase):
 
     # def test_get_duration(self):
 # TODO: Add test for get_duration
+# - if sign out time is None, returns 0 for duration

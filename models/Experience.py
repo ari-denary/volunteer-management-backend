@@ -27,7 +27,7 @@ class Experience(db.Model):
 
     sign_out_time = db.Column(
         db.String(),
-        nullable=False,
+        nullable=True,
     )
 
     department = db.Column(
@@ -56,7 +56,9 @@ class Experience(db.Model):
     def get_duration(self):
         """Get duration of experience in hours"""
 
-        print("sign in type is", type(self.sign_in_time))
+        if self.sign_out_time is None:
+            return 0
+
         sign_in = datetime.fromisoformat(self.sign_in_time)
         sign_out = datetime.fromisoformat(self.sign_out_time)
         duration = sign_out - sign_in
