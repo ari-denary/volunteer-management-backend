@@ -450,8 +450,6 @@ class UsersViewsTestCase(TestCase):
                 user_experiences
             )
 
-
-    # # TODO: get_incomplete_user_experiences_success_same_user
     def test_get_incomplete_user_experiences_success_same_user(self):
         """
         Same user can get list of their own experiences whose sign-out time is
@@ -480,8 +478,6 @@ class UsersViewsTestCase(TestCase):
                 user_experiences
             )
 
-
-    # TODO: get_incomplete_user_experiences_success_admin
     def test_get_incomplete_user_experiences_success_admin(self):
         """
         Admin can get list of a user's experiences whose sign-out time is
@@ -596,36 +592,36 @@ class UsersViewsTestCase(TestCase):
 ########################################################################
 # POST /users/<id>/experiences tests
 
-# success create new experience same user
+# TODO: success create new experience same user
 
-# success create new experience admin
+# TODO: success create new experience admin
 
-# fail create new experience not all required inputs sent
+# TODO: fail create new experience not all required inputs sent
 
-# fail create new experience diff user
+# TODO: fail create new experience diff user
 
-# fail create new experience no token
+# TODO: fail create new experience no token
 
-# fail create new experience invalid token
+# TODO: fail create new experience invalid token
 
 
 ########################################################################
 # PATCH /users/<id>/experiences tests
 
-# success update experience same user
+# TODO: success update experience same user
 
-# success update experience admin
+# TODO: success update experience admin
 
-# update experience does not update other data (besides sign out/dept) same user
+# TODO: update experience does not update other data (besides sign out/dept) same user
 
-# update experience does not update other data (besides sign out/dept) admin
+# TODO: update experience does not update other data (besides sign out/dept) admin
 
-# fail update experience missing sign out time same user
+# TODO: fail update experience missing sign out time same user
 
-# fail update experience missing sign out time admin
+# TODO: fail update experience missing sign out time admin
 
-# fail update experience diff user
+# TODO: fail update experience diff user
 
-# fail update experience no token
+# TODO: fail update experience no token
 
-# fail update experience invalid token
+# TODO: fail update experience invalid token
