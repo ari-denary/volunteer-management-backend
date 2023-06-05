@@ -1,10 +1,11 @@
 # from app import app
-from app import db
+from models.models import db
 from models.User import User
 from models.Experience import Experience
 # from models.Experience import Experience
 from datetime import datetime
 # from dateutil import relativedelta
+from app import app
 
 db.create_all()
 Experience.__table__.drop(db.engine)
@@ -17,7 +18,7 @@ u1 = User.signup(
     password='password',
     first_name="u1",
     last_name="user",
-    dob=datetime(year=2000, month=1, day=1),
+    dob=(datetime(year=2000, month=1, day=1).isoformat()),
     gender="Prefer not to say",
     address="123 Cherry lane",
     city="New York",
@@ -34,7 +35,7 @@ u2 = User.signup(
     password='password',
     first_name="u2",
     last_name="test",
-    dob=datetime(year=2000, month=1, day=1),
+    dob=(datetime(year=2000, month=1, day=1).isoformat()),
     gender="Prefer not to say",
     address="1 Cherry lane",
     city="New York",
@@ -51,7 +52,7 @@ admin = User.signup(
     password='password',
     first_name="Admin",
     last_name="test",
-    dob=datetime(year=2000, month=1, day=1),
+    dob=(datetime(year=2000, month=1, day=1).isoformat()),
     gender="Prefer not to say",
     address="123 Cherry lane",
     city="New York",
@@ -64,18 +65,20 @@ admin = User.signup(
 
 db.session.commit()
 
+e1_sign_in = datetime(year=2022, month=1, day=5, hour=8).isoformat()
+
 e1 = Experience(
     date=datetime(year=2022, month=1, day=5),
-    sign_in_time=datetime(year=2022, month=1, day=5, hour=8),
-    sign_out_time=datetime(year=2022, month=1, day=5, hour=10),
+    sign_in_time=(datetime(year=2022, month=1, day=5, hour=8).isoformat()),
+    sign_out_time=(datetime(year=2022, month=1, day=5, hour=10).isoformat()),
     department="Lab",
     user_id=1
 )
 
 e2 = Experience(
     date=datetime(year=2022, month=1, day=8),
-    sign_in_time=datetime(year=2022, month=1, day=5, hour=12),
-    sign_out_time=datetime(year=2022, month=1, day=5, hour=16),
+    sign_in_time=(datetime(year=2022, month=1, day=5, hour=12).isoformat()),
+    sign_out_time=(datetime(year=2022, month=1, day=5, hour=16).isoformat()),
     department="Pharmacy",
     user_id=1
 )
