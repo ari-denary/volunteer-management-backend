@@ -20,14 +20,14 @@ def get_users():
         users: [{
             "id": 1,
             "email": "admin@mail.com",
+            "experience_hours": 10
             "badge_number": 100,
             "first_name": "first",
             "last_name": "user",
             "is_admin": False,
             "is_student": True,
             "is_multilingual": False,
-            "status": "new",
-            "experience_hours": 10
+            "status": "new"
         } ... ]
     }
     If unauthorized request, returns JSON { "errors": "Unauthorized" }
@@ -38,16 +38,22 @@ def get_users():
         user_instances = User.query.all()
         users = []
         for u in user_instances:
+            user_experiences = Experience.query.filter_by(user_id=u.id).all()
+            experience_hours = 0
+            for exp in user_experiences:
+                experience_hours += exp.get_duration()
+
             users.append({
                 "id": u.id,
-                "email": u.email,
                 "badge_number": u.badge_number,
+                "email": u.email,
+                "experience_hours": experience_hours,
                 "first_name": u.first_name,
-                "last_name": u.last_name,
                 "is_admin": u.is_admin,
                 "is_student": u.is_student,
                 "is_multilingual": u.is_multilingual,
-                "status": u.status
+                "last_name": u.last_name,
+                "status": u.status,
             })
         return jsonify(users=users)
 
