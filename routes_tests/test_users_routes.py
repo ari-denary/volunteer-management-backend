@@ -452,31 +452,81 @@ class UsersViewsTestCase(TestCase):
 
 
     # # TODO: get_incomplete_user_experiences_success_same_user
-    # def test_get_incomplete_user_experiences_success_same_user(self):
-    #     """Same user can get list of all experiences whose sign-out time is None"""
+    def test_get_incomplete_user_experiences_success_same_user(self):
+        """
+        Same user can get list of their own experiences whose sign-out time is
+        None
+        """
 
-    #     with self.client as c:
-    #         resp1 = c.get(
-    #             f"/users/{self.u1_id}/experiences?incomplete",
-    #             headers={"AUTHORIZATION": f"Bearer {self.u1_token}"}
-    #         )
+        with self.client as c:
+            resp = c.get(
+                f"/users/{self.u1_id}/experiences?incomplete",
+                headers={"AUTHORIZATION": f"Bearer {self.u1_token}"}
+            )
 
-    #         resp2 = c.get(
-    #             f"/users/{self.u2_id}/experiences?incomplete",
-    #             headers={"AUTHORIZATION": f"Bearer {self.u2_token}"}
-    #         )
+            user_experiences = [u for u in resp.json['user_experiences']]
+            for e in user_experiences:
+                del e['id']
 
-    #         self.assertEqual(len(resp1.json['user_experiences']), 1)
-    #         self.assertEqual(len(resp2.json['user_experiences']), 0)
-    #         # TODO: test json directly
-
+            self.assertEqual(len(resp.json['user_experiences']), 1)
+            self.assertIn(
+                {
+                    "date": "2022-01-10T00:00:00",
+                    "sign_in_time": "2022-01-10T12:00:00",
+                    "sign_out_time": None,
+                    "department": "pharmacy",
+                    "user_id": self.u1_id
+                },
+                user_experiences
+            )
 
 
     # TODO: get_incomplete_user_experiences_success_admin
+    def test_get_incomplete_user_experiences_success_admin(self):
+        """
+        Admin can get list of a user's experiences whose sign-out time is
+        None
+        """
 
-    # TODO: test that empty list comes back if user has no experiences same user
+        with self.client as c:
+            resp = c.get(
+                f"/users/{self.u1_id}/experiences?incomplete",
+                headers={"AUTHORIZATION": f"Bearer {self.admin_token}"}
+            )
 
-    # TODO: test that empty list comes back if user has no experiences admin
+            user_experiences = [u for u in resp.json['user_experiences']]
+            for e in user_experiences:
+                del e['id']
+
+            self.assertEqual(len(resp.json['user_experiences']), 1)
+            self.assertIn(
+                {
+                    "date": "2022-01-10T00:00:00",
+                    "sign_in_time": "2022-01-10T12:00:00",
+                    "sign_out_time": None,
+                    "department": "pharmacy",
+                    "user_id": self.u1_id
+                },
+                user_experiences
+            )
+
+    def test_get_no_user_experiences_success_same_user(self):
+        """Same user gets an empty list if they have no experiences"""
+
+        with self.client as c:
+            resp1 = c.get(
+                f"/users/{self.u2_id}/experiences",
+                headers={"AUTHORIZATION": f"Bearer {self.u2_token}"}
+            )
+
+            resp2 = c.get(
+                f"/users/{self.u2_id}/experiences?incomplete",
+                headers={"AUTHORIZATION": f"Bearer {self.u2_token}"}
+            )
+
+            self.assertEqual(len(resp1.json['user_experiences']), 0)
+            self.assertEqual(len(resp2.json['user_experiences']), 0)
+
     def test_get_no_user_experiences_success_admin(self):
         """Admin gets an empty list if a user has no experiences"""
 
@@ -494,44 +544,54 @@ class UsersViewsTestCase(TestCase):
             self.assertEqual(len(resp1.json['user_experiences']), 0)
             self.assertEqual(len(resp2.json['user_experiences']), 0)
 
-    def test_get_user_experiences_fail_all_diff_user(self):
+    def test_get_user_experiences_fail_diff_user(self):
         """User can NOT get a list of another users' experiences"""
 
         with self.client as c:
-            resp = c.get(
+            resp1 = c.get(
                     f"/users/{self.u2_id}/experiences",
                     headers={"AUTHORIZATION": f"Bearer {self.u1_token}"}
                 )
 
-            self.assertEqual(resp.status_code, 401)
-            self.assertEqual(resp.json['errors'], "Unauthorized")
+            resp2 = c.get(
+                    f"/users/{self.u2_id}/experiences?incomplete",
+                    headers={"AUTHORIZATION": f"Bearer {self.u1_token}"}
+                )
 
-    # TODO: get_incomplete_user_experiences_fail_diff_user
+            self.assertEqual(resp1.status_code, 401)
+            self.assertEqual(resp2.status_code, 401)
+            self.assertEqual(resp1.json['errors'], "Unauthorized")
+            self.assertEqual(resp2.json['errors'], "Unauthorized")
 
     def test_get_user_experiences_fail_no_token(self):
         """Can NOT get a list of a users' experiences without token"""
 
         with self.client as c:
-            resp = c.get(f"/users/{self.u2_id}/experiences")
+            resp1 = c.get(f"/users/{self.u2_id}/experiences")
+            resp2 = c.get(f"/users/{self.u2_id}/experiences?incomplete")
 
-            self.assertEqual(resp.status_code, 401)
-            self.assertIn("Missing JWT", resp.json['msg'])
-
-    # TODO: get_incomplete_user_experiences_fail_no_token
+            self.assertEqual(resp1.status_code, 401)
+            self.assertEqual(resp2.status_code, 401)
+            self.assertIn("Missing JWT", resp1.json['msg'])
+            self.assertIn("Missing JWT", resp2.json['msg'])
 
     def test_get_user_experiences_fail_invalid_token(self):
         """Can NOT get a list of a users' experiences with invalid token"""
 
         with self.client as c:
-            resp = c.get(
+            resp1 = c.get(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {BAD_TOKEN}"}
+                )
+            resp2 = c.get(
                     f"/users/{self.u2_id}/experiences",
                     headers={"AUTHORIZATION": f"Bearer {BAD_TOKEN}"}
                 )
 
-            self.assertEqual(resp.status_code, 401)
-            self.assertEqual(resp.json['errors'], "Invalid token")
-
-    # TODO: get_incomplete_user_experiences_fail_invalid_token
+            self.assertEqual(resp1.status_code, 401)
+            self.assertEqual(resp2.status_code, 401)
+            self.assertEqual(resp1.json['errors'], "Invalid token")
+            self.assertEqual(resp2.json['errors'], "Invalid token")
 
 ########################################################################
 # POST /users/<id>/experiences tests
