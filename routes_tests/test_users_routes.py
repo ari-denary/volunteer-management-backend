@@ -782,67 +782,65 @@ class UsersViewsTestCase(TestCase):
 # # TODO: fail route does not match user_id provided in json data admin
 
 
-# # TODO: fail create new experience diff user
-#     def test_create_user_experience_fail_diff_user(self):
-#         """User can NOT create an experience for another user"""
+    def test_create_user_experience_fail_diff_user(self):
+        """User can NOT create an experience for another user"""
 
-#         experience_data = {
-#             "date": datetime(year=2022, month=1, day=8).isoformat(),
-#             "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
-#             "department": "pharmacy",
-#             "user_id": self.u2_id
-#         }
+        experience_data = {
+            "date": datetime(year=2022, month=1, day=8).isoformat(),
+            "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
+            "department": "pharmacy",
+            "user_id": self.u2_id
+        }
 
-#         with self.client as c:
-#             resp = c.post(
-#                     f"/users/{self.u2_id}/experiences",
-#                     headers={"AUTHORIZATION": f"Bearer {self.u1_token}"},
-#                     json=experience_data
-#             )
+        with self.client as c:
+            resp = c.post(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {self.u1_token}"},
+                    json=experience_data
+            )
 
-#             self.assertEqual(resp.status_code, 401)
-#             self.assertEqual(resp.json['errors'], "Unauthorized")
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.json['errors'], "Unauthorized")
 
-# # TODO: fail create new experience no token
-#     def test_create_user_experience_fail_no_token(self):
-#         """Can NOT create an experience without token"""
+    def test_create_user_experience_fail_no_token(self):
+        """Can NOT create an experience without token"""
 
-#         experience_data = {
-#             "date": datetime(year=2022, month=1, day=8).isoformat(),
-#             "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
-#             "department": "pharmacy",
-#             "user_id": self.u2_id
-#         }
+        experience_data = {
+            "date": datetime(year=2022, month=1, day=8).isoformat(),
+            "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
+            "department": "pharmacy",
+            "user_id": self.u2_id
+        }
 
-#         with self.client as c:
-#             resp = c.post(
-#                     f"/users/{self.u2_id}/experiences",
-#                     json=experience_data
-#             )
+        with self.client as c:
+            resp = c.post(
+                    f"/users/{self.u2_id}/experiences",
+                    json=experience_data
+            )
 
-#             self.assertEqual(resp.status_code, 401)
-#             self.assertIn("Missing JWT", resp.json['msg'])
+            self.assertEqual(resp.status_code, 401)
+            self.assertIn("Missing JWT", resp.json['msg'])
 
-# # TODO: fail create new experience invalid token
-#     def test_create_user_experience_fail_invalid_token(self):
-#         """Can NOT create an experience with invalid token"""
+# TODO: fail create new experience invalid token
+    def test_create_user_experience_fail_invalid_token(self):
+        """Can NOT create an experience with invalid token"""
 
-#         experience_data = {
-#             "date": datetime(year=2022, month=1, day=8).isoformat(),
-#             "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
-#             "department": "pharmacy",
-#             "user_id": self.u2_id
-#         }
+        experience_data = {
+            "date": datetime(year=2022, month=1, day=8).isoformat(),
+            "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
+            "department": "pharmacy",
+            "user_id": self.u2_id
+        }
 
-#         with self.client as c:
-#             resp = c.post(
-#                     f"/users/{self.u2_id}/experiences",
-#                     headers={"AUTHORIZATION": f"Bearer {BAD_TOKEN}"},
-#                     json=experience_data
-#             )
+        with self.client as c:
+            resp = c.post(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {BAD_TOKEN}"},
+                    json=experience_data
+            )
 
-#             self.assertEqual(resp.status_code, 401)
-#             self.assertEqual(resp.json['errors'], "Invalid token")
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.json['errors'], "Invalid token")
 
 
 ########################################################################
