@@ -618,8 +618,7 @@ class UsersViewsTestCase(TestCase):
                     headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
                     json=experience_data
             )
-            print("experience_data = ", experience_data)
-            print("resp.json for success same user = ", resp.json)
+
             resp_json = resp.json['user_experience']
             del resp_json['id']
 
@@ -651,7 +650,6 @@ class UsersViewsTestCase(TestCase):
                     json=experience_data
             )
 
-            print("resp.json for success admin = ", resp.json)
             resp_json = resp.json['user_experience']
             del resp_json['id']
 
@@ -708,61 +706,53 @@ class UsersViewsTestCase(TestCase):
                 resp.json['errors']
             )
 
-# # TODO: fail create new experience not all required inputs sent same user
-#     def test_create_user_experience_fail_invalid_inputs_same_user(self):
-#         """Same user can NOT create a new experience with invalid inputs"""
+    def test_create_user_experience_fail_invalid_inputs_same_user(self):
+        """Same user can NOT create a new experience with invalid inputs"""
 
-#         invalid_data = {
-#             "date": "bob",
-#             "sign_in_time": datetime(year=2022, month=1, day=20, hour=12).isoformat(),
-#             "department": "lab",
-#             "user_id": self.u2_id
-#         }
+        invalid_data = {
+            "date": "bob",
+            "sign_in_time": EXPERIENCE_DATA_DATE_TIME,
+            "department": "lab",
+            "user_id": self.u2_id
+        }
 
-#         with self.client as c:
-#             resp = c.post(
-#                     f"/users/{self.u2_id}/experiences",
-#                     headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
-#                     json=invalid_data
-#             )
+        with self.client as c:
+            resp = c.post(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
+                    json=invalid_data
+            )
 
-#             print("invalid input same user resp.json = ", resp.json)
+            self.assertEqual({
+                'date': [
+                    'Not a valid datetime value.'
+            ]},
+                resp.json['errors']
+            )
 
-#             self.assertEqual({
-#                 'user_id': [
-#                     'Not a valid integer value.',
-#                     'Not a valid integer value.'
-#             ]},
-#                 resp.json['errors']
-#             )
+    def test_create_user_experience_fail_invalid_inputs_admin(self):
+        """Admin can NOT create a new experience for user with invalid inputs"""
 
-# # TODO: fail create new experience not all required inputs sent admin
-#     def test_create_user_experience_fail_invalid_inputs_admin(self):
-#         """Admin can NOT create a new experience for user with invalid inputs"""
+        invalid_data = {
+            "date": "bob",
+            "sign_in_time": EXPERIENCE_DATA_DATE_TIME,
+            "department": "lab",
+            "user_id": self.u2_id
+        }
 
-#         invalid_data = {
-#             "date": datetime(year=2022, month=1, day=20).isoformat(),
-#             "sign_in_time": datetime(year=2022, month=1, day=20, hour=12).isoformat(),
-#             "department": "lab",
-#             "user_id": "bob"
-#         }
+        with self.client as c:
+            resp = c.post(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+                    json=invalid_data
+            )
 
-#         with self.client as c:
-#             resp = c.post(
-#                     f"/users/{self.u2_id}/experiences",
-#                     headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
-#                     json=invalid_data
-#             )
-
-#             print("invalid input Admin resp.json = ", resp.json)
-
-#             self.assertEqual({
-#                 'user_id': [
-#                     'Not a valid integer value.',
-#                     'Not a valid integer value.'
-#             ]},
-#                 resp.json['errors']
-#             )
+            self.assertEqual({
+                'date': [
+                    'Not a valid datetime value.'
+            ]},
+                resp.json['errors']
+            )
 
 # # TODO: fail create new experience for non-existent user admin
 #     def test_create_user_experience_fail_invalid_user_admin(self):
