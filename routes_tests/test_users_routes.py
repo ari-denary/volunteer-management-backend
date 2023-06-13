@@ -296,7 +296,7 @@ class UsersViewsTestCase(TestCase):
 
 
 ########################################################################
-# GET /users/<id> tests
+# GET /users/<user_id> tests
 
     def test_get_user_success_same_user(self):
         """User can successfully get their own details"""
@@ -358,7 +358,7 @@ class UsersViewsTestCase(TestCase):
             self.assertEqual(resp.json['errors'], "Invalid token")
 
 ########################################################################
-# GET /users/<id>/experiences tests
+# GET /users/<user_id>/experiences tests
 
     def test_get_all_user_experiences_success_same_user(self):
         """User can successfully get a list of their own experiences"""
@@ -589,24 +589,272 @@ class UsersViewsTestCase(TestCase):
             self.assertEqual(resp1.json['errors'], "Invalid token")
             self.assertEqual(resp2.json['errors'], "Invalid token")
 
+# ########################################################################
+# # POST /users/<user_id>/experiences tests
+
+# # TODO: success create new experience same user
+#     def test_create_user_experience_success_same_user(self):
+#         """Same user can create a new experience for themselves"""
+
+#         experience_data = {
+#             "date": datetime(year=2022, month=1, day=8).isoformat(),
+#             "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
+#             "department": "pharmacy",
+#             "user_id": self.u2_id
+#         }
+
+#         with self.client as c:
+#             resp = c.post(
+#                     f"/users/{self.u2_id}/experiences",
+#                     headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
+#                     json=experience_data
+#             )
+
+#             print("resp.json for success same user = ", resp.json)
+#             resp_json = resp.json['user_experience']
+#             del resp_json['id']
+
+#             # TODO: check this:
+#             experience_data = Experience.query.filter_by(user_id=self.u2_id).all()
+
+#             self.assertEqual(resp_json, {
+#                 "date": "2022-01-08T00:00:00.00000",
+#                 "sign_in_time": "2022-01-08T12:00:00.00000",
+#                 "sign_out_time": None,
+#                 "department": "pharmacy",
+#                 "user_id": self.u2_id
+#             })
+#             self.assertEqual(len(experience_data), 1)
+
+
+# # TODO: success create new experience admin
+#     def test_create_user_experience_success_admin(self):
+#         """Admin can create a new experience for a user"""
+
+#         experience_data = {
+#             "date": datetime(year=2022, month=1, day=8).isoformat(),
+#             "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
+#             "department": "pharmacy",
+#             "user_id": self.u2_id
+#         }
+
+#         with self.client as c:
+#             resp = c.post(
+#                     f"/users/{self.u2_id}/experiences",
+#                     headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+#                     json=experience_data
+#             )
+
+#             print("resp.json for success admin = ", resp.json)
+#             resp_json = resp.json['user_experience']
+#             del resp_json['id']
+
+#             # TODO: check this:
+#             experience_data = Experience.query.filter_by(user_id=self.u2_id).all()
+
+#             self.assertEqual(resp_json, {
+#                 "date": "2022-01-08T00:00:00",
+#                 "sign_in_time": "2022-01-08T12:00:00",
+#                 "sign_out_time": None,
+#                 "department": "pharmacy",
+#                 "user_id": self.u2_id
+#             })
+#             self.assertEqual(len(experience_data), 1)
+
+
+# # TODO: fail create new experience not all required inputs sent same user
+#     def test_create_user_experience_fail_incomplete_inputs_same_user(self):
+#         """Same user can NOT create a new experience with incomplete inputs"""
+
+#         incomplete_data = {
+#             "date": datetime(year=2022, month=1, day=8).isoformat(),
+#             "department": "pharmacy",
+#             "user_id": self.u2_id
+#         }
+
+#         with self.client as c:
+#             resp = c.post(
+#                     f"/users/{self.u2_id}/experiences",
+#                     headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
+#                     json=incomplete_data
+#             )
+
+#             self.assertEqual(
+#                 {'sign_in_time': ['This field is required.']},
+#                 resp.json['errors']
+#             )
+
+# # TODO: fail create new experience not all required inputs sent admin
+#     def test_create_user_experience_fail_incomplete_inputs_admin(self):
+#         """Admin can NOT create a new experience for user with incomplete inputs"""
+
+#         incomplete_data = {
+#             "date": datetime(year=2022, month=1, day=8).isoformat(),
+#             "department": "pharmacy",
+#             "user_id": self.u2_id
+#         }
+
+#         with self.client as c:
+#             resp = c.post(
+#                     f"/users/{self.u2_id}/experiences",
+#                     headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+#                     json=incomplete_data
+#             )
+
+#             self.assertEqual(
+#                 {'sign_in_time': ['This field is required.']},
+#                 resp.json['errors']
+#             )
+
+# # TODO: fail create new experience not all required inputs sent same user
+#     def test_create_user_experience_fail_invalid_inputs_same_user(self):
+#         """Same user can NOT create a new experience with invalid inputs"""
+
+#         invalid_data = {
+#             "date": "bob",
+#             "sign_in_time": datetime(year=2022, month=1, day=20, hour=12).isoformat(),
+#             "department": "lab",
+#             "user_id": self.u2_id
+#         }
+
+#         with self.client as c:
+#             resp = c.post(
+#                     f"/users/{self.u2_id}/experiences",
+#                     headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
+#                     json=invalid_data
+#             )
+
+#             print("invalid input same user resp.json = ", resp.json)
+
+#             self.assertEqual({
+#                 'user_id': [
+#                     'Not a valid integer value.',
+#                     'Not a valid integer value.'
+#             ]},
+#                 resp.json['errors']
+#             )
+
+# # TODO: fail create new experience not all required inputs sent admin
+#     def test_create_user_experience_fail_invalid_inputs_admin(self):
+#         """Admin can NOT create a new experience for user with invalid inputs"""
+
+#         invalid_data = {
+#             "date": datetime(year=2022, month=1, day=20).isoformat(),
+#             "sign_in_time": datetime(year=2022, month=1, day=20, hour=12).isoformat(),
+#             "department": "lab",
+#             "user_id": "bob"
+#         }
+
+#         with self.client as c:
+#             resp = c.post(
+#                     f"/users/{self.u2_id}/experiences",
+#                     headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+#                     json=invalid_data
+#             )
+
+#             print("invalid input Admin resp.json = ", resp.json)
+
+#             self.assertEqual({
+#                 'user_id': [
+#                     'Not a valid integer value.',
+#                     'Not a valid integer value.'
+#             ]},
+#                 resp.json['errors']
+#             )
+
+# # TODO: fail create new experience for non-existent user admin
+#     def test_create_user_experience_fail_invalid_user_admin(self):
+#         """Admin can NOT create an experience for a user that doesn't exist"""
+
+#         invalid_user = {
+#             "date": datetime(year=2022, month=1, day=20).isoformat(),
+#             "sign_in_time": datetime(year=2022, month=1, day=20, hour=12).isoformat(),
+#             "department": "lab",
+#             "user_id": 9999
+#         }
+
+#         with self.client as c:
+#             resp = c.post(
+#                     f"/users/{self.u2_id}/experiences",
+#                     headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+#                     json=invalid_user
+#             )
+
+#             self.assertEqual(resp.status_code, 404)
+#             self.assertIn("User not found", resp.json['errors'])
+
+# # TODO: fail route does not match user_id provided in json data same user
+
+
+
+# # TODO: fail route does not match user_id provided in json data admin
+
+
+# # TODO: fail create new experience diff user
+#     def test_create_user_experience_fail_diff_user(self):
+#         """User can NOT create an experience for another user"""
+
+#         experience_data = {
+#             "date": datetime(year=2022, month=1, day=8).isoformat(),
+#             "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
+#             "department": "pharmacy",
+#             "user_id": self.u2_id
+#         }
+
+#         with self.client as c:
+#             resp = c.post(
+#                     f"/users/{self.u2_id}/experiences",
+#                     headers={"AUTHORIZATION": f"Bearer {self.u1_token}"},
+#                     json=experience_data
+#             )
+
+#             self.assertEqual(resp.status_code, 401)
+#             self.assertEqual(resp.json['errors'], "Unauthorized")
+
+# # TODO: fail create new experience no token
+#     def test_create_user_experience_fail_no_token(self):
+#         """Can NOT create an experience without token"""
+
+#         experience_data = {
+#             "date": datetime(year=2022, month=1, day=8).isoformat(),
+#             "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
+#             "department": "pharmacy",
+#             "user_id": self.u2_id
+#         }
+
+#         with self.client as c:
+#             resp = c.post(
+#                     f"/users/{self.u2_id}/experiences",
+#                     json=experience_data
+#             )
+
+#             self.assertEqual(resp.status_code, 401)
+#             self.assertIn("Missing JWT", resp.json['msg'])
+
+# # TODO: fail create new experience invalid token
+#     def test_create_user_experience_fail_invalid_token(self):
+#         """Can NOT create an experience with invalid token"""
+
+#         experience_data = {
+#             "date": datetime(year=2022, month=1, day=8).isoformat(),
+#             "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
+#             "department": "pharmacy",
+#             "user_id": self.u2_id
+#         }
+
+#         with self.client as c:
+#             resp = c.post(
+#                     f"/users/{self.u2_id}/experiences",
+#                     headers={"AUTHORIZATION": f"Bearer {BAD_TOKEN}"},
+#                     json=experience_data
+#             )
+
+#             self.assertEqual(resp.status_code, 401)
+#             self.assertEqual(resp.json['errors'], "Invalid token")
+
+
 ########################################################################
-# POST /users/<id>/experiences tests
-
-# TODO: success create new experience same user
-
-# TODO: success create new experience admin
-
-# TODO: fail create new experience not all required inputs sent
-
-# TODO: fail create new experience diff user
-
-# TODO: fail create new experience no token
-
-# TODO: fail create new experience invalid token
-
-
-########################################################################
-# PATCH /users/<id>/experiences tests
+# PATCH /users/<user_id>/experiences/<exp_id> tests
 
 # TODO: success update experience same user
 
