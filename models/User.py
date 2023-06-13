@@ -58,7 +58,7 @@ class User(db.Model):
     )
 
     dob = db.Column(
-        db.DateTime,
+        db.String(),
         nullable=False,
     )
 

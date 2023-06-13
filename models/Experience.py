@@ -2,6 +2,7 @@
 
 from models.models import db
 from models.User import User
+from datetime import datetime
 
 class Experience(db.Model):
     """A volunteer experience."""
@@ -15,18 +16,18 @@ class Experience(db.Model):
     )
 
     date = db.Column(
-        db.DateTime,
+        db.String(),
         nullable=False,
     )
 
     sign_in_time = db.Column(
-        db.DateTime,
+        db.String(),
         nullable=False,
     )
 
     sign_out_time = db.Column(
-        db.DateTime,
-        nullable=False,
+        db.String(),
+        nullable=True,
     )
 
     department = db.Column(
@@ -51,5 +52,19 @@ class Experience(db.Model):
             "department": self.department,
             "user_id": self.user_id
         }
+
+    def get_duration(self):
+        """Get duration of experience in hours"""
+
+        if self.sign_out_time is None:
+            return 0
+
+        sign_in = datetime.fromisoformat(self.sign_in_time)
+        sign_out = datetime.fromisoformat(self.sign_out_time)
+        duration = sign_out - sign_in
+        hours = round(duration.total_seconds()//60/60, 2)
+
+        return hours
+
 
 

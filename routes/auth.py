@@ -69,7 +69,7 @@ def signup():
                 errors="Invalid data: email or badge number already in use"
             )
 
-    return jsonify(errors=form.errors)
+    return jsonify(errors=form.errors), 400
 
 
 @auth.post("/login")
@@ -99,4 +99,4 @@ def login():
             token = create_access_token(identity=user)
             return jsonify(token=token)
 
-    return jsonify(errors="Invalid credentials")
+    return jsonify(errors="Invalid credentials"), 400
