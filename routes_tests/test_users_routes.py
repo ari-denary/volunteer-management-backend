@@ -634,8 +634,6 @@ class UsersViewsTestCase(TestCase):
             })
             self.assertEqual(len(experience_data), 1)
 
-
-# TODO: success create new experience admin
     def test_create_user_experience_success_admin(self):
         """Admin can create a new experience for a user"""
 
@@ -657,7 +655,6 @@ class UsersViewsTestCase(TestCase):
             resp_json = resp.json['user_experience']
             del resp_json['id']
 
-            # TODO: check this:
             experience_data = Experience.query.filter_by(user_id=self.u2_id).all()
 
             self.assertEqual(resp_json, {
@@ -669,50 +666,47 @@ class UsersViewsTestCase(TestCase):
             })
             self.assertEqual(len(experience_data), 1)
 
+    def test_create_user_experience_fail_incomplete_inputs_same_user(self):
+        """Same user can NOT create a new experience with incomplete inputs"""
 
-# # TODO: fail create new experience not all required inputs sent same user
-#     def test_create_user_experience_fail_incomplete_inputs_same_user(self):
-#         """Same user can NOT create a new experience with incomplete inputs"""
+        incomplete_data = {
+            "date": EXPERIENCE_DATA_DATE_TIME,
+            "department": "pharmacy",
+            "user_id": self.u2_id
+        }
 
-#         incomplete_data = {
-#             "date": datetime(year=2022, month=1, day=8).isoformat(),
-#             "department": "pharmacy",
-#             "user_id": self.u2_id
-#         }
+        with self.client as c:
+            resp = c.post(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
+                    json=incomplete_data
+            )
 
-#         with self.client as c:
-#             resp = c.post(
-#                     f"/users/{self.u2_id}/experiences",
-#                     headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
-#                     json=incomplete_data
-#             )
+            self.assertEqual(
+                {'sign_in_time': ['This field is required.']},
+                resp.json['errors']
+            )
 
-#             self.assertEqual(
-#                 {'sign_in_time': ['This field is required.']},
-#                 resp.json['errors']
-#             )
+    def test_create_user_experience_fail_incomplete_inputs_admin(self):
+        """Admin can NOT create a new experience for user with incomplete inputs"""
 
-# # TODO: fail create new experience not all required inputs sent admin
-#     def test_create_user_experience_fail_incomplete_inputs_admin(self):
-#         """Admin can NOT create a new experience for user with incomplete inputs"""
+        incomplete_data = {
+            "date": EXPERIENCE_DATA_DATE_TIME,
+            "department": "pharmacy",
+            "user_id": self.u2_id
+        }
 
-#         incomplete_data = {
-#             "date": datetime(year=2022, month=1, day=8).isoformat(),
-#             "department": "pharmacy",
-#             "user_id": self.u2_id
-#         }
+        with self.client as c:
+            resp = c.post(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+                    json=incomplete_data
+            )
 
-#         with self.client as c:
-#             resp = c.post(
-#                     f"/users/{self.u2_id}/experiences",
-#                     headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
-#                     json=incomplete_data
-#             )
-
-#             self.assertEqual(
-#                 {'sign_in_time': ['This field is required.']},
-#                 resp.json['errors']
-#             )
+            self.assertEqual(
+                {'sign_in_time': ['This field is required.']},
+                resp.json['errors']
+            )
 
 # # TODO: fail create new experience not all required inputs sent same user
 #     def test_create_user_experience_fail_invalid_inputs_same_user(self):
