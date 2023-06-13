@@ -635,39 +635,39 @@ class UsersViewsTestCase(TestCase):
             self.assertEqual(len(experience_data), 1)
 
 
-# # TODO: success create new experience admin
-#     def test_create_user_experience_success_admin(self):
-#         """Admin can create a new experience for a user"""
+# TODO: success create new experience admin
+    def test_create_user_experience_success_admin(self):
+        """Admin can create a new experience for a user"""
 
-#         experience_data = {
-#             "date": datetime(year=2022, month=1, day=8).isoformat(),
-#             "sign_in_time": datetime(year=2022, month=1, day=8, hour=12).isoformat(),
-#             "department": "pharmacy",
-#             "user_id": self.u2_id
-#         }
+        experience_data = {
+            "date": EXPERIENCE_DATA_DATE_TIME,
+            "sign_in_time": EXPERIENCE_DATA_DATE_TIME,
+            "department": "pharmacy",
+            "user_id": self.u2_id
+        }
 
-#         with self.client as c:
-#             resp = c.post(
-#                     f"/users/{self.u2_id}/experiences",
-#                     headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
-#                     json=experience_data
-#             )
+        with self.client as c:
+            resp = c.post(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+                    json=experience_data
+            )
 
-#             print("resp.json for success admin = ", resp.json)
-#             resp_json = resp.json['user_experience']
-#             del resp_json['id']
+            print("resp.json for success admin = ", resp.json)
+            resp_json = resp.json['user_experience']
+            del resp_json['id']
 
-#             # TODO: check this:
-#             experience_data = Experience.query.filter_by(user_id=self.u2_id).all()
+            # TODO: check this:
+            experience_data = Experience.query.filter_by(user_id=self.u2_id).all()
 
-#             self.assertEqual(resp_json, {
-#                 "date": "2022-01-08T00:00:00",
-#                 "sign_in_time": "2022-01-08T12:00:00",
-#                 "sign_out_time": None,
-#                 "department": "pharmacy",
-#                 "user_id": self.u2_id
-#             })
-#             self.assertEqual(len(experience_data), 1)
+            self.assertEqual(resp_json, {
+                "date": EXPERIENCE_DATA_DATE_TIME,
+                "sign_in_time": EXPERIENCE_DATA_DATE_TIME,
+                "sign_out_time": None,
+                "department": "pharmacy",
+                "user_id": self.u2_id
+            })
+            self.assertEqual(len(experience_data), 1)
 
 
 # # TODO: fail create new experience not all required inputs sent same user
