@@ -12,6 +12,45 @@ auth = Blueprint(
     template_folder="../templates"
 )
 
+signup_schema = {
+    "type": "object",
+    "properties": {
+        "badge_number": {"type": "string"},
+        "email": {"type": "string"},
+        "password": {"type": "string"},
+        "first_name": {"type": "string"},
+        "last_name": {"type": "string"},
+        "dob": {
+            "type": "string",
+            "format": "date-time",
+            "title": "dob",
+            "description": "Datetime in the format '2022-06-12T14:30:00'",
+            "example": "2022-06-12T14:30:00"
+        },
+        "address": {"type": "string"},
+        "city": {"type": "string"},
+        "state": {"type": "string"},
+        "zip_code": {"type": "string"},
+        "phone_number": {"type": "string"},
+        "is_student": {"type": "boolean"},
+        "is_multilingual": {"type": "boolean"},
+    },
+    "required": [
+        "badge_number",
+        "email",
+        "password",
+        "first_name",
+        "last_name",
+        "dob",
+        "address",
+        "city",
+        "state",
+        "zip_code",
+        "phone_number",
+        "is_student",
+    ]
+}
+
 @auth.post("/signup")
 def signup():
     """
