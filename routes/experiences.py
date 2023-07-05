@@ -47,7 +47,7 @@ def get_all_experiences():
 
     return jsonify(errors="Unauthorized"), 401
 
-@experiences.post('/<int:user_id>/experiences')
+@experiences.post('')
 @jwt_required(optional=False, locations=['headers', 'cookies'])
 def create_user_experience(user_id):
     """
@@ -78,8 +78,7 @@ def create_user_experience(user_id):
 
     form = CreateExperienceForm(csrf_enabled=False, data=received)
 
-    if ((current_user.id == user_id and user_id == received['user_id'])
-    or current_user.is_admin):
+    if (current_user.id == received.get('user_id') or current_user.is_admin):
         if form.validate_on_submit():
             experience = Experience(
                 date=received.get('date'),
@@ -103,9 +102,9 @@ def create_user_experience(user_id):
 
     return jsonify(errors="Unauthorized"), 401
 
-# @experiences.patch('/<int:user_id>/experiences/<int:exp_id>')
+# @experiences.patch('/<int:exp_id>')
 # @jwt_required(optional=False, locations=['headers', 'cookies'])
-# def update_user_experience(user_id, exp_id):
+# def update_user_experience(exp_id):
 #     """
 #     Update a user's experience sign out time and/or department.
 #     Use case for "signing-out" of an experience.
