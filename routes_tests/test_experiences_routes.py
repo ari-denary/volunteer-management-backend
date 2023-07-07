@@ -330,7 +330,6 @@ class ExperienceRoutesTestCase(TestCase):
                 resp.json['errors']
             )
 
-# # TODO: fail create new experience for non-existent user admin
     def test_create_user_experience_fail_invalid_user_admin(self):
         """Admin can NOT create an experience for a user that doesn't exist"""
 
