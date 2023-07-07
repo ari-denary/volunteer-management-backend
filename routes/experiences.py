@@ -49,7 +49,7 @@ def get_all_experiences():
 
 @experiences.post('')
 @jwt_required(optional=False, locations=['headers', 'cookies'])
-def create_user_experience(user_id):
+def create_user_experience():
     """
     Create a new experience. Use case for "signing-in" to an experience.
     Authorization: must be same user or admin requesting with valid token.
@@ -77,15 +77,21 @@ def create_user_experience(user_id):
     received = request.json
 
     form = CreateExperienceForm(csrf_enabled=False, data=received)
+    user_id = received.get('user_id')
 
-    if (current_user.id == received.get('user_id') or current_user.is_admin):
+    if (current_user.id
+    and user_id
+    and ((current_user.id == user_id) or current_user.is_admin)):
         if form.validate_on_submit():
+            if (User.query.filter_by(id=user_id).one_or_none() is None):
+                return jsonify(errors="User not found"), 404
+
             experience = Experience(
                 date=received.get('date'),
                 sign_in_time=received.get('sign_in_time'),
                 sign_out_time=received.get('sign_out_time'),
                 department=received.get('department'),
-                user_id=received.get('user_id')
+                user_id=user_id
             )
 
             try:
