@@ -134,6 +134,7 @@ def get_user_experiences(user_id):
 
     return jsonify(errors="Unauthorized"), 401
 
+# FIXME: Delete below routes:
 @users.post('/<int:user_id>/experiences')
 @jwt_required(optional=False, locations=['headers', 'cookies'])
 def create_user_experience(user_id):

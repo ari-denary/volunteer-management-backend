@@ -175,6 +175,109 @@ class ExperienceRoutesTestCase(TestCase):
 # ########################################################################
 # # GET /experiences tests
 
+    def test_get_all_experiences_success_admin(self):
+        """Admin can retrieve all experiences for all users"""
+
+        with self.client as c:
+            resp = c.get(
+                f"/experiences",
+                headers={"AUTHORIZATION": f"Bearer {self.admin_token}"}
+            )
+
+            experiences = [u for u in resp.json['experiences']]
+            for e in experiences:
+                del e['id']
+
+            self.assertEqual(len(resp.json['experiences']), 3)
+            self.assertIn(
+                {
+                    "date": "2022-01-05T00:00:00",
+                    "sign_in_time": "2022-01-05T08:00:00",
+                    "sign_out_time": "2022-01-05T10:00:00",
+                    "department": "lab",
+                    "user_id": self.u1_id
+                },
+                experiences
+            )
+            self.assertIn(
+                {
+                    "date": "2022-01-08T00:00:00",
+                    "sign_in_time": "2022-01-08T12:00:00",
+                    "sign_out_time": "2022-01-08T16:00:00",
+                    "department": "pharmacy",
+                    "user_id": self.u1_id
+                },
+                experiences
+            )
+            self.assertIn(
+                {
+                    "date": "2022-01-10T00:00:00",
+                    "sign_in_time": "2022-01-10T12:00:00",
+                    "sign_out_time": None,
+                    "department": "pharmacy",
+                    "user_id": self.u1_id
+                },
+                experiences
+            )
+
+    def test_get_incomplete_experiences_success_admin(self):
+        """Admin can retrieve all incomplete experiences for all users"""
+
+        with self.client as c:
+            resp = c.get(
+                f"/experiences?incomplete",
+                headers={"AUTHORIZATION": f"Bearer {self.admin_token}"}
+            )
+
+            incomplete_experiences = [u for u in resp.json['experiences']]
+            for e in incomplete_experiences:
+                del e['id']
+
+            self.assertEqual(len(resp.json['experiences']), 1)
+            self.assertIn(
+                {
+                    "date": "2022-01-10T00:00:00",
+                    "sign_in_time": "2022-01-10T12:00:00",
+                    "sign_out_time": None,
+                    "department": "pharmacy",
+                    "user_id": self.u1_id
+                },
+                incomplete_experiences
+            )
+
+    def test_get_all_experiences_fail_non_admin(self):
+        """Non admin user can NOT retrieve all experiences"""
+
+        with self.client as c:
+            resp = c.get(
+                    f"/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {self.u1_token}"}
+                )
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.json['errors'], "Unauthorized")
+
+    def test_get_all_experiences_fail_no_token(self):
+        """Can NOT get a list of a users' experiences without token"""
+
+        with self.client as c:
+            resp = c.get(f"/experiences")
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertIn("Missing JWT", resp.json['msg'])
+
+    def test_get_all_experiences_fail_invalid_token(self):
+        """Can NOT get a list of a users' experiences with invalid token"""
+
+        with self.client as c:
+            resp = c.get(
+                    f"/users/{self.u2_id}/experiences",
+                    headers={"AUTHORIZATION": f"Bearer {BAD_TOKEN}"}
+                )
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.json['errors'], "Invalid token")
+
 # ########################################################################
 # # POST /experiences tests
 
