@@ -11,6 +11,7 @@ from flask_jwt_extended import (
 from models.User import User
 from routes.users import users
 from routes.auth import auth
+from routes.experiences import experiences
 
 load_dotenv()
 
@@ -60,4 +61,5 @@ def verify_jwt():
 
 app.register_blueprint(auth, url_prefix="/auth")
 app.register_blueprint(users, url_prefix="/users")
+app.register_blueprint(experiences, url_prefix="/experiences")
 

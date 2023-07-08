@@ -1,30 +1,26 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    StringField, IntegerField, DateTimeField
+    StringField, DateTimeField
 )
 from wtforms.validators import InputRequired, Optional
 
 
-class ClockInForm(FlaskForm):
+class UpdateExperienceForm(FlaskForm):
     """
     Form for validation of incoming JSON data for updating an Experience
-    with the sign out and optionally, department
+    with sign out time and optionally, department
     """
 
     class Meta:
         csrf = False
 
-    user_id = IntegerField(
-        "User id",
-        validators=[InputRequired()]
+    sign_out_time = DateTimeField(
+        "Sign Out Time",
+        validators=[InputRequired()],
+        format="%Y-%m-%dT%H:%M:%S.%f",
     )
 
     department = StringField(
         "Department",
         validators=[Optional()]
-    )
-
-    sign_out_time = DateTimeField(
-        "Sign Out Time",
-        validators=[InputRequired()]
     )

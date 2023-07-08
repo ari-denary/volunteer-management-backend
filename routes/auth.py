@@ -75,7 +75,7 @@ def signup():
 @auth.post("/login")
 def login():
     """
-    Handle user login.
+    Handles user login.
     Expecting JSON: { "email": "mail@mail.com", "password": "mypassword" }
     Returns JSON:
     - If provided valid data:
