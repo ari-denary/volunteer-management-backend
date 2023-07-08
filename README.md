@@ -221,35 +221,78 @@ The API contains the following routes that receive and return JSON.
     }
 ```
 
-### POST `/users/user_id/experiences`
+### GET `/experiences`
+- Gets all experiences for all users. Optional query parameter of 'incomplete' will return all experiences whose sign_out_time is None.
+  - Primary use case for 'incomplete' is to check any experiences that have not "signed out".
+- Authorization: must be admin requesting with valid token.
+- Returns JSON:
+```json
+   {
+        "user_experiences": [{
+            "id": 1,
+            "date": "2023-04-06-08:35:12:23",
+            "sign_in_time": "2023-04-06-08:35:12:23",
+            "sign_out_time": "2023-04-06-08:35:12:23",
+            "department": "lab",
+            "user_id": 3
+        } ... ]
+    }
+```
 
+### POST `/experiences`
 - Create a new experience. Use case for "signing-in" to an experience.
 - Authorization: must be same user or admin requesting with valid token.
-- Expects JSON - "date", "sign_in_time", "department", "user_id" required
-                 "sign_out_time" optional
+- Accepts JSON - "date", "sign_in_time", "department", "user_id" required
+                "sign_out_time" optional
 ```json
-    {
-        "date": "2022-01-05 00:00:00",
-        "sign_in_time": "2022-01-05 08:00:00",
-        "department": "lab",
-        "user_id": 3
-    }
+  {
+      "date": "2022-01-05 00:00:00",
+      "sign_in_time": "2022-01-05 08:00:00",
+      "department": "lab",
+      "user_id": 3
+  }
 ```
 
 - Returns JSON:
 ```json
-     {
-        "user_experience": {
-            "id": 1,
-            "date": "2022-01-05 00:00:00",
-            "sign_in_time": "2022-01-05 08:00:00",
-            "sign_out_time": None,
-            "department": "lab",
-            "user_id": 3
-        }
-    }
+  {
+      "user_experience": {
+          "id": 1,
+          "date": "2022-01-05 00:00:00",
+          "sign_in_time": "2022-01-05 08:00:00",
+          "sign_out_time": "None",
+          "department": "lab",
+          "user_id": 3
+      }
+  }
 ```
 
+### PATCH `/experiences/<int:exp_id>`
+- Update a user's experience sign out time and/or department.
+- Use case for "signing-out" of an experience.
+- Authorization: must be same user or admin requesting with valid token.
+- Accepts JSON - "sign_out_time" required,
+                "department" optional
+```json
+{
+    "sign_out_time": "2023-04-06-08:35:12:23",
+    "department": "pharmacy"
+}
+```
+
+- Returns JSON
+```json
+  {
+      "experience": {
+          "id": 1,
+          "date": "2023-04-06-08:35:12:23",
+          "sign_in_time": "2023-04-06-08:35:12:23",
+          "sign_out_time": "2023-04-06-08:35:12:23",
+          "department": "pharmacy",
+          "user_id": 3
+      }
+  }
+```
 
 <p align="right">(<a href="#volunteer-management-system">back to top</a>)</p>
 
@@ -264,11 +307,7 @@ FLASK_DEBUG=False python -m unittest test_filename.py
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Add GET /experiences route for getting all experiences, admin only
-- [ ] Update POST /experiences route for creating an experience, same user or admin
-      - current user must match user_id passed in json, or be admin
-- [ ] Update PATCH /experiences/<exp_id> route for updating an experience, same user or admin
-      - current user must match user_id passed in json, or be admin
+- [ ] Refactor JSON validation to use json schema while maintaining current level of datetime validation
 
 See the [open issues](https://github.com/ari-denary/volunteer-management-backend/issues) for a full list of proposed features (and known issues).
 
