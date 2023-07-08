@@ -129,15 +129,24 @@ class ExperienceRoutesTestCase(TestCase):
             user_id=u1.id
         )
 
+        e4 = Experience(
+            date=EXPERIENCE_DATA_DATE_TIME,
+            sign_in_time=EXPERIENCE_DATA_DATE_TIME,
+            sign_out_time=None,
+            department="pharmacy",
+            user_id=u2.id
+        )
+
         admin.is_admin = True
         admin.status = "active"
         u1.status = "active"
-        db.session.add_all([e1, e2, e3])
+        db.session.add_all([e1, e2, e3, e4])
         db.session.commit()
 
         self.u1_id = u1.id
         self.u2_id = u2.id
         self.admin_id = admin.id
+        self.u2_exp_id = e4.id
 
         self.client = app.test_client()
 
@@ -188,7 +197,10 @@ class ExperienceRoutesTestCase(TestCase):
             for e in experiences:
                 del e['id']
 
-            self.assertEqual(len(resp.json['experiences']), 3)
+            self.assertEqual(len(resp.json['experiences']), 4)
+            # Note the 4th experience is on u2 and intended for testing update
+            # experience, whose values change, and thus is not tested below
+
             self.assertIn(
                 {
                     "date": "2022-01-05T00:00:00",
@@ -233,7 +245,10 @@ class ExperienceRoutesTestCase(TestCase):
             for e in incomplete_experiences:
                 del e['id']
 
-            self.assertEqual(len(resp.json['experiences']), 1)
+            self.assertEqual(len(resp.json['experiences']), 2)
+            # Note the 2nd experience is on u2 and intended for testing update
+            # experience, whose values change, and thus is not tested below
+
             self.assertIn(
                 {
                     "date": "2022-01-10T00:00:00",
@@ -244,6 +259,7 @@ class ExperienceRoutesTestCase(TestCase):
                 },
                 incomplete_experiences
             )
+
 
     def test_get_all_experiences_fail_non_admin(self):
         """Non admin user can NOT retrieve all experiences"""
@@ -310,7 +326,7 @@ class ExperienceRoutesTestCase(TestCase):
                 "department": "pharmacy",
                 "user_id": self.u2_id
             })
-            self.assertEqual(len(experience_data), 1)
+            self.assertEqual(len(experience_data), 2)
 
     def test_create_user_experience_success_admin(self):
         """Admin can create a new experience for a user"""
@@ -341,7 +357,7 @@ class ExperienceRoutesTestCase(TestCase):
                 "department": "pharmacy",
                 "user_id": self.u2_id
             })
-            self.assertEqual(len(experience_data), 1)
+            self.assertEqual(len(experience_data), 2)
 
     def test_create_user_experience_fail_incomplete_inputs_same_user(self):
         """Same user can NOT create a new experience with incomplete inputs"""
@@ -433,7 +449,7 @@ class ExperienceRoutesTestCase(TestCase):
                 resp.json['errors']
             )
 
-    def test_create_user_experience_fail_invalid_user_admin(self):
+    def test_create_user_experience_fail_nonexistent_user_admin(self):
         """Admin can NOT create an experience for a user that doesn't exist"""
 
         invalid_user_experience_data = {
@@ -514,22 +530,348 @@ class ExperienceRoutesTestCase(TestCase):
 
 
 ########################################################################
-# PATCH /users/<user_id>/experiences/<exp_id> tests
+# PATCH /experiences/<exp_id> tests
 
-# TODO: success update experience same user
+    def test_update_experience_success_same_user(self):
+        """Same user can update their own experience"""
 
-# TODO: success update experience admin
+        sign_out_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=2,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
 
-# TODO: update experience does not update other data (besides sign out/dept) same user
+        update_data = {
+            "sign_out_time": sign_out_time,
+            "department": "lab",
+        }
 
-# TODO: update experience does not update other data (besides sign out/dept) admin
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/{self.u2_exp_id}",
+                    headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
+                    json=update_data
+            )
 
-# TODO: fail update experience missing sign out time same user
+            resp_json = resp.json.get('user_experience')
+            del resp_json['id']
 
-# TODO: fail update experience missing sign out time admin
+            self.assertEqual(resp_json, {
+                "date": EXPERIENCE_DATA_DATE_TIME,
+                "sign_in_time": EXPERIENCE_DATA_DATE_TIME,
+                "sign_out_time": sign_out_time,
+                "department": "lab",
+                "user_id": self.u2_id
+            })
 
-# TODO: fail update experience diff user
+    def test_update_experience_success_admin(self):
+        """Admin can update an experience"""
 
-# TODO: fail update experience no token
+        sign_out_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=2,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
 
-# TODO: fail update experience invalid token
+        update_data = {
+            "sign_out_time": sign_out_time,
+            "department": "lab",
+        }
+
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/{self.u2_exp_id}",
+                    headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+                    json=update_data
+            )
+
+            resp_json = resp.json.get('user_experience')
+            del resp_json['id']
+
+            self.assertEqual(resp_json, {
+                "date": EXPERIENCE_DATA_DATE_TIME,
+                "sign_in_time": EXPERIENCE_DATA_DATE_TIME,
+                "sign_out_time": sign_out_time,
+                "department": "lab",
+                "user_id": self.u2_id
+            })
+
+    def test_update_experience_extra_inputs_ignored_same_user(self):
+        """Extra data from same user ignored when updating own experience"""
+
+        sign_out_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=2,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
+
+        fake_sign_in_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=10,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
+
+        extra_input_data = {
+            "sign_out_time": sign_out_time,
+            "department": "lab",
+            "sign_in_time": fake_sign_in_time,
+        }
+
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/{self.u2_exp_id}",
+                    headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
+                    json=extra_input_data
+            )
+
+            resp_json = resp.json.get('user_experience')
+            del resp_json['id']
+
+            self.assertEqual(resp_json, {
+                "date": EXPERIENCE_DATA_DATE_TIME,
+                "sign_in_time": EXPERIENCE_DATA_DATE_TIME,
+                "sign_out_time": sign_out_time,
+                "department": "lab",
+                "user_id": self.u2_id
+            })
+
+    def test_update_experience_extra_inputs_ignored_admin(self):
+        """Extra inputs from admin ignored when updating an experience"""
+
+        sign_out_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=2,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
+
+        fake_sign_in_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=10,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
+
+        extra_input_data = {
+            "sign_out_time": sign_out_time,
+            "department": "lab",
+            "sign_in_time": fake_sign_in_time,
+        }
+
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/{self.u2_exp_id}",
+                    headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+                    json=extra_input_data
+            )
+
+            resp_json = resp.json.get('user_experience')
+            del resp_json['id']
+
+            self.assertEqual(resp_json, {
+                "date": EXPERIENCE_DATA_DATE_TIME,
+                "sign_in_time": EXPERIENCE_DATA_DATE_TIME,
+                "sign_out_time": sign_out_time,
+                "department": "lab",
+                "user_id": self.u2_id
+            })
+
+    def test_update_experience_fail_incomplete_inputs_same_user(self):
+        """Same user can NOT update their experience with incomplete inputs"""
+
+        incomplete_data = {
+            "department": "lab",
+        }
+
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/{self.u2_exp_id}",
+                    headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
+                    json=incomplete_data
+            )
+
+            self.assertEqual(
+                {'sign_out_time': ['This field is required.']},
+                resp.json['errors']
+            )
+
+    def test_update_experience_fail_incomplete_inputs_admin(self):
+        """Admin can NOT update an experience with incomplete inputs"""
+
+        incomplete_data = {
+            "department": "lab",
+        }
+
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/{self.u2_exp_id}",
+                    headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+                    json=incomplete_data
+            )
+
+            self.assertEqual(
+                {'sign_out_time': ['This field is required.']},
+                resp.json['errors']
+            )
+
+    def test_update_experience_fail_nonexistent_experience_same_user(self):
+        """Same user can NOT update an experience that doesn't exist"""
+
+        sign_out_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=2,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
+
+        update_data = {
+            "sign_out_time": sign_out_time,
+            "department": "lab",
+        }
+
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/999999999",
+                    headers={"AUTHORIZATION": f"Bearer {self.u2_token}"},
+                    json=update_data
+            )
+
+            self.assertEqual(resp.status_code, 404)
+            self.assertIn("Experience not found", resp.json['errors'])
+
+    def test_update_experience_fail_nonexistent_experience_admin(self):
+        """Admin can NOT update an experience that doesn't exist"""
+
+        sign_out_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=2,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
+
+        update_data = {
+            "sign_out_time": sign_out_time,
+            "department": "lab",
+        }
+
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/999999999",
+                    headers={"AUTHORIZATION": f"Bearer {self.admin_token}"},
+                    json=update_data
+            )
+
+            self.assertEqual(resp.status_code, 404)
+            self.assertIn("Experience not found", resp.json['errors'])
+
+    def test_update_experience_fail_diff_user(self):
+        """User can NOT update another user's experience"""
+
+        sign_out_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=2,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
+
+        update_data = {
+            "sign_out_time": sign_out_time,
+            "department": "lab",
+        }
+
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/{self.u2_exp_id}",
+                    headers={"AUTHORIZATION": f"Bearer {self.u1_token}"},
+                    json=update_data
+            )
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.json['errors'], "Unauthorized")
+
+    def test_update_experience_fail_no_token(self):
+        """Can NOT update and experience without a token"""
+
+        sign_out_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=2,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
+
+        update_data = {
+            "sign_out_time": sign_out_time,
+            "department": "lab",
+        }
+
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/{self.u2_exp_id}",
+                    json=update_data
+            )
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertIn("Missing JWT", resp.json['msg'])
+
+
+    def test_update_experience_fail_invalid_token(self):
+        """Can NOT update an experience with an invalid token"""
+
+        sign_out_time = datetime(
+            year=2022,
+            month=1,
+            day=8,
+            hour=2,
+            minute=12,
+            second=1,
+            microsecond=1
+        ).isoformat()
+
+        update_data = {
+            "sign_out_time": sign_out_time,
+            "department": "lab",
+        }
+
+        with self.client as c:
+            resp = c.patch(
+                    f"/experiences/{self.u2_exp_id}",
+                    headers={"AUTHORIZATION": f"Bearer {BAD_TOKEN}"},
+                    json=update_data
+            )
+
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp.json['errors'], "Invalid token")
