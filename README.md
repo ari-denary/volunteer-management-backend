@@ -72,38 +72,48 @@ This is an API for managing volunteers and their experience hours.
 
 
 <!-- GETTING STARTED -->
-<!-- ## Getting Started
+## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps. -->
+<!-- To get a local copy up and running, follow these steps -->
 
 <!-- ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
 * npm
   ```sh
   npm install npm@latest -g
-  ```
-  -->
+  ``` -->
 
-<!-- ### Installation
+### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Clone the repo
    ```sh
    git clone https://github.com/ari-denary/volunteer-management-backend.git
    ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+
+2. cd into project folder in terminal window
+
+3. Create a virtual environment
+```shell
+python3 -m venv venv
+```
+
+4. Activate venv
+```shell
+source venv/bin/activate
+```
+
+5. Install in `venv` all items from `requirements.txt`
+```shell
+pip3 install -r requirements.txt
+```
+
+8. Run Flask
+```shell
+flask run
+```
 
 <p align="right">(<a href="#volunteer-management-system">back to top</a>)</p>
--->
+
 
 
 <!-- USAGE EXAMPLES -->
