@@ -49,6 +49,7 @@ class UserModelTestCase(TestCase):
             zip_code="11001",
             phone_number="9991234567",
             is_student=True,
+            is_healthcare_provider=False,
             is_multilingual=False
         )
 
@@ -80,6 +81,7 @@ class UserModelTestCase(TestCase):
             zip_code="11001",
             phone_number="9991234567",
             is_student=False,
+            is_healthcare_provider=False,
             is_multilingual=False
         )
 
@@ -104,6 +106,7 @@ class UserModelTestCase(TestCase):
                 zip_code="11001",
                 phone_number="9991234567",
                 is_student=True,
+                is_healthcare_provider=False,
                 is_multilingual=False
             )
             db.session.commit()
@@ -124,6 +127,7 @@ class UserModelTestCase(TestCase):
                 zip_code="11001",
                 phone_number="9991234567",
                 is_student=True,
+                is_healthcare_provider=False,
                 is_multilingual=False
             )
             db.session.commit()

@@ -35,6 +35,11 @@ class User(db.Model):
         nullable=False,
         unique=True,
     )
+    
+    school_email = db.Column(
+        db.String(100),
+        nullable=True,
+    )
 
     password = db.Column(
         db.Text,
@@ -48,12 +53,12 @@ class User(db.Model):
     )
 
     first_name = db.Column(
-        db.String(50),
+        db.String(100),
         nullable=False,
     )
 
     last_name = db.Column(
-        db.String(50),
+        db.String(100),
         nullable=False,
     )
 
@@ -63,17 +68,32 @@ class User(db.Model):
     )
 
     gender = db.Column(
-        db.String(50),
+        db.String(100),
         nullable=False,
+    )
+    
+    prounouns = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    race = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    ethnicity = db.Column(
+        db.String(100),
+        nullable=True
     )
 
     address = db.Column(
-        db.String(50),
+        db.String(100),
         nullable=False,
     )
 
     city = db.Column(
-        db.String(50),
+        db.String(100),
         nullable=False,
     )
 
@@ -91,16 +111,87 @@ class User(db.Model):
         db.String(11),
         nullable=False
     )
+    
+    phone_carrier = db.Column(
+        db.String(100),
+        nullable=True
+    )
 
     is_student = db.Column(
         db.Boolean,
         nullable=False
+    )
+    
+    type_of_student = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    school = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    degree = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    anticipated_graduation = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    major = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    minor = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    classification = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    is_healthcare_provider = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    
+    type_of_provider = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    employer = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    degree = db.Column(
+        db.String(100),
+        nullable=True
     )
 
     is_multilingual = db.Column(
         db.Boolean,
         nullable=False,
         default=False
+    )
+    
+    language = db.Column(
+        db.String(100),
+        nullable=True
+    )
+    
+    other_languages = db.Column(
+        db.String(100),
+        nullable=True
     )
 
     is_admin = db.Column(
