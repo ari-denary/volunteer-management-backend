@@ -139,6 +139,7 @@ The API contains the following routes that receive and return JSON.
         "zip_code":"11001",
         "phone_number":"9991234567",
         "is_student":"true",
+        "is_healthcare_provider": "false",
         "is_multilingual":"false"
     }
 ```
@@ -178,6 +179,7 @@ The API contains the following routes that receive and return JSON.
             "last_name": "user",
             "is_admin": False,
             "is_student": True,
+            "is_healthcare_provider": False,
             "is_multilingual": False,
             "status": "new"
         } ... ]
@@ -194,13 +196,18 @@ The API contains the following routes that receive and return JSON.
         "user": {
             "id": 1,
             "email": "admin@mail.com",
+            "school_email": "joe@school.edu",
             "badge_number": 100,
             "first_name": "first",
             "last_name": "user",
             "dob": "Sat, 01 Jan 2000 00:00:00 GMT",
-            "gender": "Prefer not to say",
+            "gender": "male",
+            "pronouns": "he/him",
+            "race": "white",
+            "ethnicity": "caucasian",
             "created_at": "Sun, 21 May 2023 20:12:14 GMT",
             "phone_number": "9991234567",
+            "phone_carrier": "verizon",
             "address": "123 Cherry lane",
             "city": "New York",
             "state": "NY",
@@ -208,6 +215,17 @@ The API contains the following routes that receive and return JSON.
             "is_admin": false,
             "is_multilingual": false,
             "is_student": true,
+            "type_of_student": "full-time",
+            "school": "Oklahoma State",
+            "anticipated_graduation": "Sun, 19 May 2025 20:12:14 GMT",
+            "major": "Biology",
+            "minor": null,
+            "classification": null,
+            "degree": "B.S.",
+            "is_healthcare_provider": false,
+            "type_of_provider": null,
+            "employer": null,
+            "is_multilingual": false,
             "status": "new",
         }
     }
@@ -226,6 +244,22 @@ The API contains the following routes that receive and return JSON.
             "sign_in_time": "2023-04-06-08:35:12:23",
             "sign_out_time": "2023-04-06-08:35:12:23",
             "department": "lab",
+            "user_id": 3
+        } ... ]
+    }
+```
+
+### GET `users/user_id/languages`
+
+- Gets all languages for a user.
+- Authorization: must be same user or admin requesting with valid token.
+- Returns JSON:
+```json
+    {
+        "user_languages": [{
+            "id": 1,
+            "language": "spanish",
+            "fluency": "proficent",
             "user_id": 3
         } ... ]
     }

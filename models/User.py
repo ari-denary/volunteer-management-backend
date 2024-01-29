@@ -72,7 +72,7 @@ class User(db.Model):
         nullable=False,
     )
     
-    prounouns = db.Column(
+    pronouns = db.Column(
         db.String(100),
         nullable=True
     )
@@ -172,11 +172,6 @@ class User(db.Model):
         db.String(100),
         nullable=True
     )
-    
-    degree = db.Column(
-        db.String(100),
-        nullable=True
-    )
 
     is_multilingual = db.Column(
         db.Boolean,
@@ -184,16 +179,6 @@ class User(db.Model):
         default=False
     )
     
-    language = db.Column(
-        db.String(100),
-        nullable=True
-    )
-    
-    other_languages = db.Column(
-        db.String(100),
-        nullable=True
-    )
-
     is_admin = db.Column(
         db.Boolean,
         nullable=False,
@@ -231,7 +216,6 @@ class User(db.Model):
     @classmethod
     def signup(
         cls,
-        badge_number,
         email,
         password,
         first_name,
@@ -244,7 +228,24 @@ class User(db.Model):
         zip_code,
         phone_number,
         is_student,
-        is_multilingual
+        is_healthcare_provider,
+        is_multilingual,
+        badge_number=None,
+        status=None,
+        pronouns=None,
+        race=None,
+        ethnicity=None,
+        phone_carrier=None,
+        type_of_student=None,
+        school=None,
+        anticipated_graduation=None,
+        major=None,
+        minor=None,
+        classification=None,
+        degree=None,
+        school_email=None,
+        type_of_provider=None,
+        employer=None,
     ):
         """Sign up user.
 
@@ -254,20 +255,36 @@ class User(db.Model):
         hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
 
         user = User(
+            status=status,
             badge_number=badge_number,
             email=email,
             password=hashed_pwd,
             first_name=first_name,
             last_name=last_name,
-            dob=dob,
             gender=gender,
+            dob=dob,
             address=address,
             city=city,
             state=state,
             zip_code=zip_code,
             phone_number=phone_number,
             is_student=is_student,
-            is_multilingual=is_multilingual
+            is_healthcare_provider=is_healthcare_provider,
+            is_multilingual=is_multilingual,
+            school_email=school_email,
+            pronouns=pronouns,
+            race=race,
+            ethnicity=ethnicity,
+            phone_carrier=phone_carrier,
+            type_of_student=type_of_student,
+            school=school,
+            anticipated_graduation=anticipated_graduation,
+            major=major,
+            minor=minor,
+            classification=classification,
+            degree=degree,
+            type_of_provider=type_of_provider,
+            employer=employer,
         )
 
         db.session.add(user)
@@ -280,16 +297,31 @@ class User(db.Model):
             "id": self.id,
             "badge_number": self.badge_number,
             "email": self.email,
+            "school_email": self.school_email,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "dob": self.dob,
             "gender": self.gender,
+            "pronouns": self.pronouns,
+            "race": self.race,
+            "ethnicity": self.ethnicity,
             "address": self.address,
             "city": self.city,
             "state": self.state,
             "zip_code": self.zip_code,
             "phone_number": self.phone_number,
+            "phone_carrier": self.phone_carrier,
             "is_student": self.is_student,
+            "type_of_student": self.type_of_student,
+            "school": self.school,
+            "anticipated_graduation": self.anticipated_graduation,
+            "major": self.major,
+            "minor": self.minor,
+            "classification": self.classification,
+            "degree": self.degree,
+            "is_healthcare_provider": self.is_healthcare_provider,
+            "type_of_provider": self.type_of_provider,
+            "employer": self.employer,
             "is_multilingual": self.is_multilingual,
             "is_admin": self.is_admin,
             "status": self.status,

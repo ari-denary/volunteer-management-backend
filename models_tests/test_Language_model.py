@@ -1,4 +1,4 @@
-"""Experience model tests."""
+"""Language model tests."""
 
 import os
 from unittest import TestCase
@@ -7,7 +7,7 @@ from datetime import datetime
 
 from models.models import db
 from models.User import User
-from models.Experience import Experience
+from models.Language import Language
 
 # To use a different database for tests, set env variable.
 # Must be before app is imported
@@ -20,14 +20,14 @@ bcrypt = Bcrypt()
 # Create tables once for all tests.
 # Data deleted & fresh test data set within each test
 db.create_all()
-Experience.__table__.drop(db.engine)
+Language.__table__.drop(db.engine)
 db.drop_all()
 db.create_all()
 
 
-class ExperienceModelTestCase(TestCase):
+class LanguageModelTestCase(TestCase):
     def setUp(self):
-        Experience.query.delete()
+        Language.query.delete()
         User.query.delete()
 
         hashed_password = (bcrypt
@@ -64,8 +64,5 @@ class ExperienceModelTestCase(TestCase):
         db.session.rollback()
 
 ############################################################
-# get_duration Tests
+# Methods Tests:
 
-    # def test_get_duration(self):
-# TODO: Add test for get_duration
-# - if sign out time is None, returns 0 for duration

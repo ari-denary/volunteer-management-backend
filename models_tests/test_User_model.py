@@ -14,7 +14,7 @@ from models.Experience import Experience
 # Must be before app is imported
 os.environ['DATABASE_URI'] = "postgresql:///volunteer_management_test"
 
-from app import app
+from index import app
 
 bcrypt = Bcrypt()
 

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, current_user
 from models.User import User
 from models.Experience import Experience
+from models.Language import Language
 
 users = Blueprint(
     "users",
@@ -26,6 +27,7 @@ def get_users():
             "last_name": "user",
             "is_admin": False,
             "is_student": True,
+            "is_healthcare_provider": False,
             "is_multilingual": False,
             "status": "new"
         } ... ]
@@ -50,6 +52,7 @@ def get_users():
                 "first_name": u.first_name,
                 "is_admin": u.is_admin,
                 "is_student": u.is_student,
+                "is_healthcare_provider": u.is_healthcare_provider,
                 "is_multilingual": u.is_multilingual,
                 "last_name": u.last_name,
                 "status": u.status,
@@ -82,6 +85,7 @@ def get_user(user_id):
             "is_admin": false,
             "is_multilingual": false,
             "is_student": true,
+            "is_healthcare_provider": false,
             "status": "new",
         }
     }
@@ -129,6 +133,32 @@ def get_user_experiences(user_id):
         user_experiences = [e.serialize() for e in experiences]
 
         return jsonify(user_experiences=user_experiences)
+
+    return jsonify(errors="Unauthorized"), 401
+
+@users.get('/<int:user_id>/languages')
+@jwt_required(optional=False, locations=['headers', 'cookies'])
+def get_user_languages(user_id):
+    """
+    Gets all languages for a user. 
+    Authorization: must be same user or admin requesting with valid token.
+    Returns JSON {
+        user_languages: [{
+            "id": 1,
+            "language": "spanish",
+            "fluency": "proficient",
+            "user_id": 3
+        } ... ]
+    }
+    If unauthorized request, returns JSON { "errors": "Unauthorized" }
+    """
+
+    if (current_user.id == user_id or current_user.is_admin):
+        languages = Language.query.filter_by(user_id=user_id).all()
+
+        user_languages = [e.serialize() for e in languages]
+
+        return jsonify(user_languages=user_languages)
 
     return jsonify(errors="Unauthorized"), 401
 

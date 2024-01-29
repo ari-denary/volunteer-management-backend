@@ -17,7 +17,8 @@ Flask-DebugToolbar==0.13.1
 Flask-JWT-Extended==4.4.4
 Flask-SQLAlchemy==3.0.3
 Flask-WTF==1.1.1
-greenlet==2.0.2
+greenlet==3.0.3
+gunicorn==21.2.0
 idna==3.4
 ipython==8.13.2
 itsdangerous==2.1.2
@@ -25,6 +26,7 @@ jedi==0.18.2
 Jinja2==3.1.2
 MarkupSafe==2.1.2
 matplotlib-inline==0.1.6
+packaging==23.2
 parso==0.8.3
 pexpect==4.8.0
 pickleshare==0.7.5
@@ -42,7 +44,7 @@ SQLAlchemy==2.0.13
 SQLAlchemy-Utils==0.41.1
 stack-data==0.6.2
 traitlets==5.9.0
-typing_extensions==4.5.0
+typing_extensions==4.9.0
 urllib3==2.0.2
 wcwidth==0.2.6
 Werkzeug==2.3.4

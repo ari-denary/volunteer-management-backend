@@ -1,11 +1,11 @@
-from app import app
+from index import app
 from models.models import db
 from models.User import User
 from models.Experience import Experience
 from datetime import datetime
 # from dateutil import relativedelta
 
-
+print("SEEDING")
 db.create_all()
 Experience.__table__.drop(db.engine)
 db.drop_all()
@@ -25,6 +25,7 @@ u1 = User.signup(
     zip_code="11001",
     phone_number="9991234567",
     is_student=True,
+    is_healthcare_provider=False,
     is_multilingual=False
 )
 
@@ -42,6 +43,7 @@ u2 = User.signup(
     zip_code="11001",
     phone_number="9991234567",
     is_student=False,
+    is_healthcare_provider=False,
     is_multilingual=False
 )
 
@@ -59,8 +61,10 @@ admin = User.signup(
     zip_code="11001",
     phone_number="9991234567",
     is_student=False,
+    is_healthcare_provider=False,
     is_multilingual=False
 )
+
 
 db.session.commit()
 
