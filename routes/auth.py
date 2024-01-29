@@ -30,6 +30,7 @@ def signup():
         "zip_code":"11001",
         "phone_number":"9991234567",
         "is_student":"true",
+        "is_healthcare_provider":"false",
         "is_multilingual":"false"
     }
     Returns JSON: { "token": "dleoidlksd.aslkfjoiweflkfj.aldsjfoweifsldf" }
@@ -54,6 +55,7 @@ def signup():
             zip_code=received.get("zip_code"),
             phone_number=received.get("phone_number"),
             is_student=received.get("is_student"),
+            is_healthcare_provider=received.get("is_healthcare_provider"),
             is_multilingual=received.get("is_multilingual")
         )
 

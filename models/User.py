@@ -230,7 +230,7 @@ class User(db.Model):
         is_student,
         is_healthcare_provider,
         is_multilingual,
-        badge_number=None,
+        # badge_number=None,
         status=None,
         pronouns=None,
         race=None,
@@ -256,7 +256,7 @@ class User(db.Model):
 
         user = User(
             status=status,
-            badge_number=badge_number,
+            # badge_number=badge_number,
             email=email,
             password=hashed_pwd,
             first_name=first_name,
