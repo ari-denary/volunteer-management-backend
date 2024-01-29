@@ -11,7 +11,7 @@ from models.models import db
 # Must be before app is imported
 os.environ['DATABASE_URI'] = "postgresql:///volunteer_management_test"
 
-from index import app
+from app import app
 
 app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 

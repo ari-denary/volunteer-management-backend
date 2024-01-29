@@ -1,4 +1,4 @@
-from index import app
+from app import app
 from models.models import db
 from models.User import User
 from models.Experience import Experience

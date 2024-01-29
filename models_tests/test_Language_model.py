@@ -13,7 +13,7 @@ from models.Language import Language
 # Must be before app is imported
 os.environ['DATABASE_URI'] = "postgresql:///volunteer_management_test"
 
-from index import app
+from app import app
 
 bcrypt = Bcrypt()
 
