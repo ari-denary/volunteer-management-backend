@@ -94,3 +94,8 @@ class SignUpForm(FlaskForm):
         "Speaks another language?",
         validators=[]
     )
+    
+    is_admin = BooleanField(
+        "Is an Admin?",
+        validators=[]
+    )
