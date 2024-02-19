@@ -26,7 +26,7 @@ class User(db.Model):
     badge_number = db.Column(
         db.Integer,
         unique=True,
-        nullable=False,
+        nullable=True,
         autoincrement=True,
     )
 
