@@ -163,6 +163,16 @@ The API contains the following routes that receive and return JSON.
 ```
 
 
+### GET `/users/race-ethnicity-options`
+  - Authorization: None Required 
+  - Returns JSON {
+        race_ethnicity_options: {
+          "race": [...],
+          "ethnicity: [...],
+          "ethnic_background": [...]
+        }
+  }
+
 ### GET `/users`
 
 - Gets all users.
@@ -327,7 +337,7 @@ The API contains the following routes that receive and return JSON.
 - Returns JSON
 ```json
   {
-      "experience": {
+      "user_experience": {
           "id": 1,
           "date": "2023-04-06-08:35:12:23",
           "sign_in_time": "2023-04-06-08:35:12:23",

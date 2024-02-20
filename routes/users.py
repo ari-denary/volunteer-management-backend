@@ -11,6 +11,28 @@ users = Blueprint(
     template_folder="../templates"
 )
 
+@users.get('/race-ethnicity-options')
+@jwt_required(optional=True, locations=['headers', 'cookies'])
+def get_race_ethnicity_options():
+    """
+    Gets all Database options for a user's race, ethnicity, and ethnic background.
+    Returns JSON {
+        race_ethnicity_options: {
+            "race": [...],
+            "ethnicity: [...],
+            "ethnic_background": [...]
+        }
+    """
+    
+    race_ethnicity_options = {
+        "race": User.get_race_options(),
+        "ethnicity": User.get_ethnicity_options(),
+        "ethnic_background": User.get_ethnic_background_options()
+    }
+    
+    return jsonify(race_ethnicity_options=race_ethnicity_options)
+    
+
 @users.get('')
 @jwt_required(optional=False, locations=['headers', 'cookies'])
 def get_users():

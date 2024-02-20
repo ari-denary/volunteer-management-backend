@@ -123,7 +123,7 @@ def update_experience(exp_id):
         "department": "pharmacy"
     }
     Returns JSON {
-        "experience": {
+        "user_experience": {
             "id": 1,
             "date": "2023-04-06-08:35:12:23",
             "sign_in_time": "2023-04-06-08:35:12:23",

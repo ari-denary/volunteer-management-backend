@@ -330,6 +330,7 @@ class User(db.Model):
             "created_at": self.created_at
         }
         
+    @classmethod
     def get_race_options(self):
         return [
             "Native American or Alaska Native",
@@ -345,6 +346,7 @@ class User(db.Model):
             "I Prefer Not to Share"
         ]
         
+    @classmethod
     def get_ethnicity_options(self):
         return [
             "Hispanic or Latino",
@@ -353,6 +355,7 @@ class User(db.Model):
             "I Prefer Not to Share"
         ]
         
+    @classmethod
     def get_ethnic_background_options(self):
         return [
             "African",
